@@ -1,0 +1,110 @@
+/* =====================================================================
+   v2 · NYDER Games: intro, enseñanzas en video, combate, checklist, táctil
+   ===================================================================== */
+#splash { background: #000; animation: none; }
+#splash canvas { width: 100%; height: 100%; object-fit: contain; }
+.t-copy { position: absolute; left: 0; right: 0; bottom: 1.2%; font-size: .62em; color: #ffffff66; letter-spacing: .2em; }
+
+/* Iconos de la barra del HUD (sin emojis) */
+.ic { display: inline-block; width: 1em; height: 1em; vertical-align: middle; background: currentColor; }
+.ic-book { clip-path: polygon(0 10%, 45% 18%, 50% 22%, 55% 18%, 100% 10%, 100% 90%, 55% 98%, 50% 100%, 45% 98%, 0 90%); }
+.ic-sound { clip-path: polygon(0 35%, 30% 35%, 60% 5%, 60% 95%, 30% 65%, 0 65%, 0 35%, 72% 30%, 80% 25%, 92% 50%, 80% 75%, 72% 70%, 80% 50%, 72% 30%); }
+#btn-sound.off .ic-sound { clip-path: polygon(0 35%, 30% 35%, 60% 5%, 60% 95%, 30% 65%, 0 65%); opacity: .5; }
+.ic-menu { clip-path: polygon(0 10%, 100% 10%, 100% 25%, 0 25%, 0 42%, 100% 42%, 100% 58%, 0 58%, 0 75%, 100% 75%, 100% 90%, 0 90%); }
+.lemon { display: inline-block; width: .9em; height: .75em; margin-right: .25em; background: #f6e04a; border-radius: 50%; box-shadow: inset -2px -2px 0 #c9b020; vertical-align: -.05em; }
+
+/* Checklist de objetivos */
+#hud-list { margin-top: .3em; font-family: var(--body); font-size: .7em; line-height: 1.35; }
+#hud-list .cl-head { color: var(--muted); font-size: .9em; margin-bottom: .1em; }
+#hud-list .cl { display: flex; gap: .45em; align-items: center; color: #fff; }
+#hud-list .cl i { width: .85em; height: .85em; border: 2px solid #ffd34d; border-radius: 3px; flex: none; }
+#hud-list .cl.done { color: #9fe8bf; text-decoration: line-through; text-decoration-color: #ffffff55; }
+#hud-list .cl.done i { background: var(--ok); border-color: var(--ok); }
+
+/* ---------- Enseñanza en video ---------- */
+.modal.video { left: 4%; right: 4%; top: 3%; bottom: 3%; background: #0a0816f4; border: 3px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; padding: .5em .7em; gap: .4em; }
+.v-head { display: flex; align-items: center; gap: .7em; font-family: var(--pix); }
+.v-head b { flex: 1; font-size: 1.05em; }
+.v-tag { font-size: .7em; color: var(--gold); border: 1px solid #ffd34d66; border-radius: 6px; padding: .05em .45em; }
+.v-x { background: none; border: 2px solid var(--line); border-radius: 8px; padding: 0 .5em; }
+.v-stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.v-stage canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; border-radius: 8px; image-rendering: auto; background: #000; cursor: pointer; }
+.v-sub { position: absolute; left: 6%; right: 6%; bottom: 3%; background: #000c; border-radius: 8px; padding: .35em .8em; line-height: 1.35; font-size: .95em; text-align: center; }
+.v-sub.pop { animation: pop .25s ease both; }
+.v-who { color: var(--gold); font-family: var(--pix); font-size: .78em; display: block; }
+.v-quiz { position: absolute; inset: 6% 8%; background: #120e26f2; border: 2px solid var(--gold); border-radius: 12px; padding: .8em 1em; display: flex; flex-direction: column; gap: .5em; overflow: auto; }
+.vq-tag { font-family: var(--pix); color: var(--gold); font-size: .8em; letter-spacing: .1em; }
+.vq-q { font-size: 1.05em; line-height: 1.35; }
+.vq-o { display: grid; gap: .4em; }
+.vq-o button { text-align: left; background: #ffffff0d; border: 2px solid #ffffff22; border-radius: 10px; padding: .45em .7em; }
+.vq-o button:hover:not(:disabled) { border-color: var(--accent2); }
+.vq-o button.right { border-color: var(--ok); background: #4fd18b26; }
+.vq-o button.wrong { border-color: var(--ko); background: #ff6b7a26; opacity: .7; }
+.vq-why { line-height: 1.4; }
+.vq-why .btn { margin-left: .5em; }
+.v-big { position: absolute; font-size: 4em; color: #fffc; background: #0008; border-radius: 50%; width: 1.6em; height: 1.6em; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.v-ctrl { display: flex; align-items: center; gap: .5em; font-family: var(--pix); }
+.v-ctrl > button { background: #ffffff10; border: 2px solid var(--line); border-radius: 8px; padding: .1em .6em; min-width: 2.4em; }
+.v-dots { display: flex; gap: .3em; flex: 1; }
+.v-dots i { width: .7em; height: .7em; border-radius: 50%; background: #ffffff22; }
+.v-dots i.done { background: var(--accent2); }
+.v-dots i.on { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+.v-voice { font-size: .7em; color: var(--muted); }
+.v-voice.warn { color: var(--ko); }
+.v-end { display: flex; gap: .5em; justify-content: flex-end; }
+.nb-row { display: flex; gap: .4em; }
+.nb-row .nb-item { flex: 1; }
+.nb-vid { background: #6d6ff022; border: 2px solid var(--accent2); border-radius: 8px; font-family: var(--pix); padding: 0 .7em; }
+
+/* ---------- Combate ---------- */
+.modal.battle2 { left: 3%; right: 3%; top: 3%; bottom: 3%; display: grid; grid-template-columns: 1.05fr 1fr; grid-template-rows: 1fr auto; gap: .5em; background: #0a0816f0; border: 3px solid var(--line); border-radius: 12px; padding: .6em; }
+.modal.battle2.boss { border-color: #ff6b7a; box-shadow: 0 0 30px #ff6b7a44; }
+.bt-arena { grid-column: 1; grid-row: 1; min-height: 0; display: flex; align-items: center; }
+.bt-arena canvas { width: 100%; aspect-ratio: 480 / 200; border-radius: 8px; image-rendering: pixelated; }
+.bt-msg { grid-column: 1; grid-row: 2; background: #faf6ec; color: #241a3a; border: 3px solid #2a2040; border-radius: 10px; padding: .5em .8em; min-height: 3.2em; font-family: var(--pix); position: relative; cursor: pointer; }
+.bt-more { position: absolute; right: .6em; bottom: .2em; font-style: normal; font-size: .7em; animation: blink 1s steps(2) infinite; }
+.bt-panel { grid-column: 2; grid-row: 1 / span 2; display: flex; flex-direction: column; gap: .45em; min-height: 0; overflow: auto; transition: opacity .2s; }
+.bt-panel.dim { opacity: .35; }
+.bt-concept { font-size: .75em; color: var(--muted); }
+.again-tag { color: #241a3a; background: var(--gold); border-radius: 4px; padding: 0 .35em; margin-right: .3em; }
+.bt-q { font-size: 1em; line-height: 1.35; }
+.bt-opts { display: grid; grid-template-columns: 1fr 1fr; gap: .4em; }
+.bt-opts .opt.move { border-left: 6px solid var(--accent2); }
+.bt-opts.pop .opt { animation: pop .3s ease both; }
+.bt-opts.pop .opt:nth-child(2) { animation-delay: .04s; }
+.bt-opts.pop .opt:nth-child(3) { animation-delay: .08s; }
+.bt-opts.pop .opt:nth-child(4) { animation-delay: .12s; }
+.battle2:not(.asking) .bt-opts .opt:not(.right):not(.wrong) { opacity: .55; }
+.bt-hint { background: #ffd34d1a; border-left: 3px solid var(--gold); padding: .3em .6em; font-size: .9em; }
+.bt-feedback { border-radius: 8px; padding: .45em .7em; line-height: 1.4; font-size: .92em; }
+.bt-feedback.ok { background: #4fd18b1f; border: 2px solid #4fd18b77; }
+.bt-feedback.ko { background: #ff6b7a1a; border: 2px solid #ff6b7a77; }
+.bt-feedback .again { display: block; margin-top: .25em; color: var(--gold); font-size: .9em; }
+.bt-tools { display: flex; gap: .35em; flex-wrap: wrap; margin-top: auto; }
+.bt-code { margin: 0; }
+
+/* ---------- Táctil ---------- */
+#touch { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+#stick { position: absolute; left: 3%; bottom: 6%; width: 22vmin; height: 22vmin; border-radius: 50%; background: #ffffff14; border: 2px solid #ffffff33; pointer-events: auto; touch-action: none; }
+#stick-knob { position: absolute; left: 50%; top: 50%; width: 42%; height: 42%; margin: -21% 0 0 -21%; border-radius: 50%; background: #ffffff55; border: 2px solid #fff8; }
+#tbtns { position: absolute; right: 3%; bottom: 14%; display: flex; gap: 3vmin; align-items: flex-end; pointer-events: auto; }
+#tbtns button { width: 15vmin; height: 15vmin; border-radius: 50%; background: #6d6ff066; border: 2px solid #fff8; font-family: var(--pix); font-size: 4.2vmin; touch-action: none; }
+#tbtns #tb-run { width: 11vmin; height: 11vmin; font-size: 2.4vmin; background: #ffffff22; }
+#tbtns #tb-run.on { background: #ffd34d88; }
+body.touch .hud-btns { bottom: auto; top: calc(var(--u) * 7); }
+body.touch .hud-btns button { padding: .4em .6em; }
+#rotate { position: fixed; inset: 0; z-index: 99; background: #000e; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2em; font-family: var(--pix); font-size: 18px; }
+
+/* ---------- Pantallas chicas (teléfono horizontal) ---------- */
+@media (max-height: 520px), (max-width: 900px) {
+  #stage { font-size: calc(var(--u) * 1.75); }
+  .hud-r { max-width: 40%; }
+  #hud-list { font-size: .62em; }
+  .modal.battle2 { grid-template-columns: 1fr 1.15fr; padding: .4em; }
+  .bt-q { font-size: .9em; }
+  .opt, .vq-o button { font-size: .85em; padding: .35em .5em; }
+  .card { left: 3%; right: 3%; top: 3%; bottom: 3%; }
+  .menu { left: 18%; right: 18%; }
+  .modal.title-menu { width: 60%; }
+  .v-sub { font-size: .85em; }
+}

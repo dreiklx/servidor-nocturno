@@ -5,7 +5,8 @@ const fs = require('fs'), path = require('path');
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const out = process.argv[2];
 const specs = process.argv.slice(3);
-const base = 'file:///' + path.resolve(__dirname, '..', 'index.html').replace(/\\/g, '/');
+const base = process.env.BASE || ('file:///' + path.resolve(__dirname, '..', 'index.html').replace(/\\/g, '/'));
+const VW = +(process.env.VW || 1280), VH = +(process.env.VH || 720), MOBILE = !!process.env.MOBILE, WAIT = +(process.env.WAIT || 1800);
 const port = 9333 + Math.floor(Math.random() * 300);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -22,14 +23,15 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ws.addEventListener('message', ev => { const m = JSON.parse(ev.data); if (m.id && pending[m.id]) { pending[m.id](m); delete pending[m.id]; } });
   const send = (method, params = {}) => new Promise(r => { const i = ++id; pending[i] = r; ws.send(JSON.stringify({ id: i, method, params })); });
   await send('Page.enable'); await send('Runtime.enable');
-  await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 720, deviceScaleFactor: 1, mobile: false });
+  await send('Emulation.setDeviceMetricsOverride', { width: VW, height: VH, deviceScaleFactor: 1, mobile: MOBILE });
+  if (MOBILE) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
   for (const spec of specs) {
     const i1 = spec.indexOf('|'), i2 = spec.indexOf('|', i1 + 1);
     const name = spec.slice(0, i1), q = i2 < 0 ? spec.slice(i1 + 1) : spec.slice(i1 + 1, i2), extra = i2 < 0 ? '' : spec.slice(i2 + 1);
     await send('Page.navigate', { url: base + '?' + q });
-    await sleep(1800);
+    await sleep(WAIT);
     if (extra) { const ex = await send('Runtime.evaluate', { expression: extra, awaitPromise: true }); if (ex.result.exceptionDetails) console.log('EXC', JSON.stringify(ex.result.exceptionDetails).slice(0, 300)); else if (ex.result.result.value) console.log('=>', ex.result.result.value); await sleep(900); }
-    const r = await send('Page.captureScreenshot', { format: 'jpeg', quality: 45, fromSurface: true, clip: { x: 0, y: 0, width: 1280, height: 720, scale: 0.45 } });
+    const r = await send('Page.captureScreenshot', { format: 'jpeg', quality: 45, fromSurface: true, clip: { x: 0, y: 0, width: VW, height: VH, scale: +(process.env.SCALE || (VW > 1000 ? 0.45 : 0.7)) } });
     fs.writeFileSync(path.join(out, name + '.jpg'), Buffer.from(r.result.data, 'base64'));
     const ev = await send('Runtime.evaluate', { expression: 'location.search + " press=" + document.getElementById("press").hidden + " hud=" + document.getElementById("hud").hidden + " " + (window.__err||"")' });
     console.log(name, fs.statSync(path.join(out, name + '.jpg')).size, ev.result.result.value);

@@ -50,13 +50,13 @@ window.SPR = (function () {
     return (cache[key] = make(rows, pal));
   }
 
-  function chela() {
-    if (cache.chela) return cache.chela;
-    const pal = { r: '#d8433b', R: '#a52a25', s: '#c98a5a', e: '#2a1408', m: '#7a2a20', o: '#f08a24', w: '#fff6e6', d: '#5a2a10', g: '#d9d9d9' };
-    const rows = mirror(['........', '.....rrr', '....rrrr', '...rRrrr', '...rssss', '...ssess', '...sssss', '....ssmm', '...oooww', '..ooowww', '..sowwww', '..sowwww', '...owwww', '...ooooo', '....oo..', '....dd..']);
-    return (cache.chela = make(rows, pal));
+  // Erika Ceviches: versión ilustrada y original (visera, pelo largo oscuro, aretes, delantal con limones).
+  const ERI = { k: '#2a1a14', K: '#5a3424', v: '#22b8a4', V: '#137a70', s: '#c98a5a', e: '#1a0c06', m: '#c0303a', y: '#ffd34d', w: '#fff6e6', a: '#9ad04a', A: '#6aa02a', l: '#ffe14d', p: '#2b2f4a', b: '#141418' };
+  function erika() {
+    if (cache.erika) return cache.erika;
+    const rows = mirror(['........', '....vvvv', '..VVvvvv', '...kkkkk', '..kkssss', '..kksess', '..ykssss', '..kksssm', '..kk.sss', '.kkwwwww', '.kswaaaa', '..swalaa', '..swaaaa', '...aaala', '...aaaaa', '....pp..', '....bb..']);
+    return (cache.erika = make(rows, ERI));
   }
-
   // Profe Mauricio: pelo corto oscuro, sonrisa amable, barba corta, polo roja con cuello azul marino.
   const MAU = { k: '#1e1a18', s: '#d9a27a', S: '#c08860', g: '#a87b5c', e: '#1a1010', m: '#7a2a20', w: '#ffffff', r: '#c8262c', R: '#9c1c22', n: '#1d2a4a', p: '#3a3a44', b: '#141418' };
   function mauricio() {
@@ -80,15 +80,13 @@ window.SPR = (function () {
       '.......hhhss', '.....hhhhhhw', '...hhhhhhhhw', '..hhhhhhhhhw', '.hhhhhhhhhhh', '.hhhhhhhhhhh', 'hhhhhhhhhhhh', 'hhhhhhhhhhhh']);
     return (cache.kaiP = make(rows, Object.assign({}, KAI, { S: '#c99470', m: '#8a3a3a' })));
   }
-  function chelaPortrait() {
-    if (cache.chP) return cache.chP;
-    const pal = { r: '#d8433b', R: '#a52a25', s: '#c98a5a', S: '#b07448', e: '#2a1408', w: '#ffffff', m: '#7a2a20', o: '#f08a24', a: '#fff6e6', y: '#ffd34d' };
+  function erikaPortrait() {
+    if (cache.erP) return cache.erP;
     const rows = mirror([
-      '............', '.......rrrrr', '.....rrrrrrr', '....rrRrrrrr', '...rrrrrrrrr', '...rrrssssss', '...rrsssssss', '....ssssssss',
-      '....sskkssss', '....sswessss', '....ssssssss', '....ssssssss', '....sssssssS', '.....sssmwww', '.....sssssss', '......ssssss',
-      '.......sssss', '.....oooaaaa', '...ooooaaaaa', '..oooooaaaay', '.ooooooaaaaa', '.ooooooaaaaa', 'oooooooaaaaa', 'oooooooaaaaa']);
-    pal.k = '#3a2014';
-    return (cache.chP = make(rows, pal));
+      '............', '......vvvvvv', '....vvvvvvvv', '..VVVVVVVVVV', '...kkkkkkkkk', '..kkkKkkkkkk', '..kkkkssssss', '..kkksssssss',
+      '..kkkseessss', '..kkkssessss', '..kkksssssss', '..ykkssssssss'.slice(0, 12), '...kkssmssss', '...kksssmmmm', '....kkssssss', '....kk.sssss',
+      '...kkk..ssss', '..kkwwwwwwww', '.kkwwaaaaaaa', '.kwwaaalaaaa', 'kwwwaaaaaaal', 'kwwwaalaaaaa', 'wwwwaaaaaaaa', 'wwwwaaaaaaaa']);
+    return (cache.erP = make(rows, ERI));
   }
   function guidePortrait(tint) {
     const key = 'gP' + tint; if (cache[key]) return cache[key];
@@ -149,5 +147,5 @@ window.SPR = (function () {
     const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(cv, 0, 0, c.width, c.height); return c;
   }
 
-  return { kai, guide, chela, mauricio, mauPortrait, kaiPortrait, chelaPortrait, guidePortrait, enemy, tipNpc, shade, scaled, ENEMY };
+  return { kai, guide, erika, erikaPortrait, chela: erika, chelaPortrait: erikaPortrait, mauricio, mauPortrait, kaiPortrait, guidePortrait, enemy, tipNpc, shade, scaled, ENEMY };
 })();

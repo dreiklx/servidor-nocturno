@@ -23,7 +23,7 @@ window.MINI = (function () {
   }
   function done(S, html) {
     AUDIO.fx.win();
-    S.body.innerHTML = `<div class="mg-done">⭐ ¡Prueba superada!</div>${html ? `<div class="mg-sum">${html}</div>` : ''}`;
+    S.body.innerHTML = `<div class="mg-done">¡Prueba superada!</div>${html ? `<div class="mg-sum">${html}</div>` : ''}`;
     S.clearFb(); S.actions.innerHTML = '';
     const b = S.button('Continuar', 'primary', () => S.resolve(true));
     if (AUTO) setTimeout(() => b.click(), 0); else b.focus();
@@ -37,7 +37,7 @@ window.MINI = (function () {
     function round() {
       const R = def.rounds[r]; pos = 0; S.clearFb();
       S.prog.textContent = `Ronda ${r + 1}/${def.rounds.length} · ${R.name}`;
-      S.body.innerHTML = `<div class="crane-wrap"><div class="crane-stack"><div class="crane-hook">🪝 Contenedores en el barco</div><ol class="stack"></ol></div><div class="crane-pool"></div></div>`;
+      S.body.innerHTML = `<div class="crane-wrap"><div class="crane-stack"><div class="crane-hook">Contenedores en el barco</div><ol class="stack"></ol></div><div class="crane-pool"></div></div>`;
       const pool = S.body.querySelector('.crane-pool'), stack = S.body.querySelector('.stack');
       LOGIC.shuffle(R.lines.map((t, i) => ({ t, i }))).forEach(({ t, i }) => {
         const b = h('button', 'crate', esc(t)); b.dataset.i = i;
@@ -73,7 +73,7 @@ window.MINI = (function () {
       if (!queue.length) { done(S, `Clasificadas: ${ok} a la primera, ${bad} con segundo intento.`); return; }
       const c = queue[0]; S.clearFb();
       S.prog.textContent = `Quedan ${queue.length}`;
-      S.body.innerHTML = `<div class="sort-card">📦 ${esc(c.t)}</div><div class="bins"></div>`;
+      S.body.innerHTML = `<div class="sort-card">${esc(c.t)}</div><div class="bins"></div>`;
       const bins = S.body.querySelector('.bins');
       def.bins.forEach((name, i) => {
         const b = h('button', 'bin', `<b>${esc(name)}</b><small>${esc(defs[i])}</small>`);
@@ -197,7 +197,7 @@ window.MINI = (function () {
   /* ---------- 4 · Cambio de agujas (bloqueos) ---------- */
   function locks(def) {
     return choiceRounds(def, def.rounds, it => ({
-      html: `<div class="lock-scene">🚦 ${esc(it.t)}</div><table class="mini compat"><tr><th>Existente \\ Pide</th><th>S</th><th>X</th></tr><tr><td>S</td><td>Compatible</td><td>Espera</td></tr><tr><td>X</td><td>Espera</td><td>Espera</td></tr></table>`,
+      html: `<div class="lock-scene">${esc(it.t)}</div><table class="mini compat"><tr><th>Existente \\ Pide</th><th>S</th><th>X</th></tr><tr><td>S</td><td>Compatible</td><td>Espera</td></tr><tr><td>X</td><td>Espera</td><td>Espera</td></tr></table>`,
       choices: def.choices.map(esc), correct: it.a, why: esc(it.why)
     }), 'locks');
   }
@@ -210,7 +210,7 @@ window.MINI = (function () {
       const R = def.rounds[r], chain = LOGIC.restoreChain(R.items); let q = [];
       S.clearFb(); S.actions.innerHTML = '';
       S.prog.textContent = `Caso ${r + 1}/${def.rounds.length} · ${R.name}`;
-      S.body.innerHTML = `<div class="timeline">${R.items.map(it => `<button class="bk ${it.k}" data-id="${it.id}"><b>${it.k}</b><span>${it.id}</span><small>${esc(it.d)}</small></button>`).join('')}<div class="bk fail">⚡<small>Falla: ${esc(R.fail)}</small></div></div>
+      S.body.innerHTML = `<div class="timeline">${R.items.map(it => `<button class="bk ${it.k}" data-id="${it.id}"><b>${it.k}</b><span>${it.id}</span><small>${esc(it.d)}</small></button>`).join('')}<div class="bk fail"><small>Falla: ${esc(R.fail)}</small></div></div>
         <div class="queue-l">Orden de restauración:</div><div class="queue"><i>(vacío: haga clic en los respaldos)</i></div>`;
       const qb = S.body.querySelector('.queue');
       const paint = () => { qb.innerHTML = q.length ? q.map((id, i) => `<span class="qi">${i + 1}. ${id}</span>`).join(' → ') : '<i>(vacío: haga clic en los respaldos)</i>'; S.body.querySelectorAll('.bk[data-id]').forEach(b => b.classList.toggle('used', q.includes(b.dataset.id))); };
@@ -238,8 +238,8 @@ window.MINI = (function () {
   /* ---------- 6 · Llaves de la bóveda (seguridad) ---------- */
   function keys(def) {
     return choiceRounds(def, def.locks, it => ({
-      html: `<div class="lock-scene">🔐 ${esc(it.t)}</div>`,
-      choices: def.keys.map(k => '🗝️ ' + esc(k)), correct: it.a,
+      html: `<div class="lock-scene">${esc(it.t)}</div>`,
+      choices: def.keys.map(k => esc(k)), correct: it.a,
       why: esc(['Roles con mínimo privilegio: permisos asignados por función (GRANT/DENY/REVOKE).', 'RLS: predicados de filtrado deciden qué filas ve cada usuario.', 'DDM: cambia la presentación del dato; lo almacenado queda intacto.', 'Cifrado de columna: protege el contenido con una clave; descifrar requiere permiso.', 'Auditoría: registra acciones para rastrear cambios.'][it.a])
     }), 'keys');
   }
@@ -273,7 +273,7 @@ window.MINI = (function () {
       paint();
       const s = def.seq[i], cq = S.body.querySelector('.cache-q');
       if (s.op === 'inv') {
-        cq.innerHTML = `⚠️ ${esc(s.t)}`; cacheSet.delete(s.k);
+        cq.innerHTML = `Ojo: ${esc(s.t)}`; cacheSet.delete(s.k);
         const nb = S.button('Entendido', 'primary', () => { i++; S.clearFb(); step(); });
         if (AUTO) later(() => nb.click()); else nb.focus();
         return;
@@ -317,7 +317,7 @@ window.MINI = (function () {
       const why = it.opts[0].startsWith('Replic')
         ? ['Total: cada nodo tiene una copia completa.', 'Parcial: solo ciertas partes se replican.', 'Sin replicación: cada dato vive en un solo nodo.'][it.a]
         : ['Horizontal: se reparten FILAS (por ejemplo, por país).', 'Vertical: se reparten COLUMNAS (personales vs. financieras).', 'Mixta: combina filas de un país con solo algunas columnas.'][it.a];
-      return { html: `<div class="lock-scene">✂️ ${esc(it.t)}</div>${table}`, choices: it.opts.map(esc), correct: it.a, why: esc(why) };
+      return { html: `<div class="lock-scene">${esc(it.t)}</div>${table}`, choices: it.opts.map(esc), correct: it.a, why: esc(why) };
     }, 'cut');
   }
 
@@ -334,7 +334,7 @@ window.MINI = (function () {
       const T = def.tasks[k]; S.clearFb(); S.actions.innerHTML = '';
       S.prog.textContent = `Ejercicio ${T.n} · ${k + 1}/${def.tasks.length}`;
       const expected = LOGIC.mqlRun(def.docs, T.f, T.op, T.v).map(d => d.nombre).join('|');
-      S.body.innerHTML = `<div class="lock-scene">🗂️ Ej. ${T.n}: ${esc(T.t)}</div>
+      S.body.innerHTML = `<div class="lock-scene">Ej. ${T.n}: ${esc(T.t)}</div>
         <div class="mql-builder">db.cursos.find({ <select class="sf">${def.fields.map(f => `<option>${f}</option>`).join('')}</select>
         <select class="so">${def.ops.map(o => `<option value="${o}">${o === '=' ? ': (igual)' : o}</option>`).join('')}</select>
         <select class="sv"></select> })</div>

@@ -1,4 +1,4 @@
-/* SERVIDOR NOCTURNO · motor del juego (Nightdare Games) */
+/* SERVIDOR NOCTURNO · motor del juego (NYDER Games) */
 (function () {
   const AUTO = UI.AUTO;
   const params = new URLSearchParams(location.search || location.hash.slice(1));
@@ -39,6 +39,8 @@
   const hash = (x, y) => { let n = x * 374761393 + y * 668265263; n = (n ^ (n >> 13)) * 1274126177; return ((n ^ (n >> 16)) >>> 0) / 4294967295; };
 
   function loadPhase(i, opt = {}) {
+    UI.theme = PH[i].theme || 'final';
+    AUDIO.setStep(PH[i].theme || 'torre'); AUDIO.ambient(PH[i].theme || 'torre');
     const def = PH[i];
     const map = MAPS.build(def.id);
     const theme = THEMES[def.theme];
@@ -98,31 +100,42 @@
   function objective() {
     const d = W.def, id = d.id;
     const ent = t => W.ents.find(e => e.type === t);
+    const it = (t, done) => ({ t, done: !!done });
     if (id === 'final') {
-      if (!S.chelaSeen.final) return { text: 'Hable con Doña Chela en la recepción', target: ent('chela') };
-      if (!S.done) return { text: 'Suba a la cima: el Profe Mauricio lo espera', target: ent('boss') };
-      return { text: '¡Servidor encendido! Gracias por jugar.', target: null };
+      if (!S.chelaSeen.final) return { text: 'Hable con Erika en la recepción', target: ent('chela'), head: 'Antes de subir', list: [it('Hablar con Erika (guarda la partida)', false), it('Enfrentar al Profe Mauricio', false)] };
+      if (!S.done) return { text: 'Suba a la cima: el Profe Mauricio lo espera', target: ent('boss'), head: 'Examen final', list: [it('Hablar con Erika', true), it('Superar los 3 actos del Profe Mauricio', false)] };
+      return { text: '¡Servidor encendido! Gracias por jugar.', target: null, head: 'Listo', list: [] };
     }
-    if (!S.talked[id]) return { text: `Hable con ${d.npc.name}`, target: ent('npc') };
+    if (!S.talked[id]) return { text: `Hable con ${d.npc.name} (el signo !)`, target: ent('npc'), head: 'Para empezar', list: [it(`Hablar con ${d.npc.name}`, false)] };
+    const title = l => lessonById[l].title;
     const lessonEnt = ids => W.ents.find(e => e.type === 'lesson' && ids.includes(d.lessons[e.idx].id) && !S.read[d.lessons[e.idx].id]);
     const nearestEnemy = z => W.ents.filter(e => e.type === 'enemy' && e.zone === z).sort((a, b) => dist(a.px, a.py, P.x, P.y) - dist(b.px, b.py, P.x, P.y))[0];
     const mgEnt = k => W.ents.find(e => e.type === 'mg' && e.idx === k);
-    if (!W.gatesOpen.has(1)) { const z = zoneLessons(0); return { text: `Lea las pizarras brillantes (${z.filter(l => S.read[l]).length}/${z.length})`, target: lessonEnt(z) }; }
+    const mgName = k => CONTENT.mg[d.minigames[k]].title;
+    if (!W.gatesOpen.has(1)) {
+      const z = zoneLessons(0);
+      return { text: `Vea las pizarras brillantes (${z.filter(l => S.read[l]).length}/${z.length})`, target: lessonEnt(z), head: 'Para abrir el primer paso', list: z.map(l => it('Ver: ' + title(l), S.read[l])) };
+    }
     if (!W.gatesOpen.has(2)) {
-      const z = zoneLessons(1), r = z.filter(l => S.read[l]).length, left = enemiesLeft(1), mgd = !!S.mg[d.minigames[0]];
+      const z = zoneLessons(1), left = enemiesLeft(1), mgd = !!S.mg[d.minigames[0]];
       const t = lessonEnt(z) || (left ? nearestEnemy(1) : null) || (!mgd ? mgEnt(0) : null);
-      return { text: `Pizarras ${r}/${z.length} · ${d.enemy.name}: ${3 - left}/3 · Prueba “${CONTENT.mg[d.minigames[0]].title}” ${mgd ? '✔' : '✘'}`, target: t };
+      const list = z.map(l => it('Ver: ' + title(l), S.read[l])).concat([it(`Vencer ${d.enemy.name} (${3 - left}/3)`, !left), it(`Prueba: ${mgName(0)}`, mgd)]);
+      const nx = list.find(x => !x.done);
+      return { text: nx ? nx.t : 'Siga al marcador', target: t, head: 'Para abrir el segundo paso', list };
     }
     if (!W.gatesOpen.has(3)) {
-      const left = enemiesLeft(2), mgd = !!S.mg[d.minigames[1]];
-      const t = (left ? nearestEnemy(2) : null) || (!mgd ? mgEnt(1) : null);
-      return { text: `${d.enemy.name}: ${3 - left}/3 · Prueba “${CONTENT.mg[d.minigames[1]].title}” ${mgd ? '✔' : '✘'}`, target: t };
+      const z = zoneLessons(2), left = enemiesLeft(2), mgd = !!S.mg[d.minigames[1]];
+      const t = lessonEnt(z) || (left ? nearestEnemy(2) : null) || (!mgd ? mgEnt(1) : null);
+      const list = z.map(l => it('Ver: ' + title(l), S.read[l])).concat([it(`Vencer ${d.enemy.name} (${3 - left}/3)`, !left), it(`Prueba: ${mgName(1)}`, mgd)]);
+      const nx = list.find(x => !x.done);
+      return { text: nx ? nx.t : 'Siga al marcador', target: t, head: 'Para llegar al jefe', list };
     }
     if (!S.boss[d.boss.id]) {
-      if (!S.chelaSeen[id]) return { text: 'Visite el puestito de ceviche de Doña Chela', target: ent('chela') };
-      return { text: `Enfrente a ${d.boss.name}`, target: ent('boss') };
+      const list = [it('Pasar por el puesto de Erika Ceviches (guarda)', S.chelaSeen[id]), it(`Vencer a ${d.boss.name}`, false)];
+      if (!S.chelaSeen[id]) return { text: 'Pase por el puesto de Erika Ceviches', target: ent('chela'), head: 'Antes del jefe', list };
+      return { text: `Enfrente a ${d.boss.name}`, target: ent('boss'), head: 'Jefe de la fase', list };
     }
-    return { text: 'Entre al portal para seguir', target: ent('portal') };
+    return { text: 'Entre al portal para seguir', target: ent('portal'), head: 'Fase superada', list: [it('Entrar al portal', false)] };
   }
 
   /* ======================= Render estático ======================= */
@@ -458,7 +471,7 @@
     g.fillStyle = '#111'; g.beginPath(); g.arc(X - 13, Y + 1, 2.5, 0, 7); g.arc(X + 5, Y + 1, 2.5, 0, 7); g.fill();
     g.drawImage(SPR.chela(), X + 6, Y - 16);
     if (!S.chelaSeen[W.def.id]) bubble(X + 14, Y - 22, '♥');
-    label(X - 2, Y - 38, 'Doña Chela', '#ffb35a');
+    label(X - 2, Y - 38, 'Erika Ceviches', '#ffb35a');
   }
   function bubble(X, Y, ch) {
     const b = Math.sin(time * 5) * 1.5;
@@ -578,10 +591,12 @@
         if (!S.talked[d.id]) { S.talked[d.id] = true; UI.toast('Nuevo objetivo: lea las pizarras brillantes', 'gold'); }
       } else if (e.type === 'lesson') {
         const L = d.lessons[e.idx], first = !S.read[L.id];
-        if (!S.talked[d.id] && d.id !== 'final') { await UI.dialog([`Antes de leer, hable con ${d.npc.name}: le dará el contexto.`], { name: 'Kai', portrait: SPR.kaiPortrait() }); }
+        if (!S.talked[d.id] && d.id !== 'final') { await UI.dialog([`Primero hable con ${d.npc.name} (el del signo !): le explica qué pasa aquí.`], { name: 'Kai', portrait: SPR.kaiPortrait() }); }
         else {
-          await UI.lesson(L, { tag: `Pizarra ${e.idx + 1}/${d.lessons.length}` });
-          if (first) { S.read[L.id] = true; AUDIO.fx.found(); burst(e.px, e.py - 12, '#7ad7ff', 16); UI.toast('📖 Pizarra añadida a la Libreta (L)', 'blue'); updateGates(); }
+          const tag = `Enseñanza ${e.idx + 1}/${d.lessons.length}`;
+          const r = window.VIDEO && VIDEO.has(L.id) ? await VIDEO.play(L.id, { title: L.title, tag }) : 'board';
+          if (r === 'board') await UI.lesson(L, { tag: `Pizarra ${e.idx + 1}/${d.lessons.length}` });
+          if (first) { S.read[L.id] = true; AUDIO.fx.found(); burst(e.px, e.py - 12, '#7ad7ff', 16); UI.toast('Guardado en la Libreta (L): video y pizarra', 'blue'); updateGates(); }
         }
       } else if (e.type === 'mg') {
         const id = d.minigames[e.idx], def = CONTENT.mg[id];
@@ -592,7 +607,7 @@
           if (k === 0) await MINI.run(id);
         } else {
           const ok = await MINI.run(id);
-          if (ok) { S.mg[id] = true; UI.toast(`⭐ Prueba superada: ${def.title}`, 'gold'); burst(e.px, e.py - 12, '#ffd34d', 24); updateGates(); save(); }
+          if (ok) { S.mg[id] = true; UI.toast(`Prueba superada: ${def.title}`, 'gold'); burst(e.px, e.py - 12, '#ffd34d', 24); updateGates(); save(); }
         }
       } else if (e.type === 'chela') await chela();
       else if (e.type === 'boss') { if (d.id === 'final') await finalBoss(); else await bossBattle(e); }
@@ -611,6 +626,7 @@
     let wrongDone = !wrongFirst;
     const tick = () => {
       const b = window.__battle; if (!b || b.finished) return;
+      if (!b.q || !b.map.length) { setTimeout(tick, 0); return; }
       if (!b.answered) {
         let k = b.map.findIndex(x => x.i === 0);
         if (!wrongDone) { k = b.map.findIndex(x => x.i !== 0); wrongDone = true; }
@@ -631,7 +647,7 @@
       const a = Math.atan2(P.y - e.py, P.x - e.px); P.x += Math.cos(a) * 18; P.y += Math.sin(a) * 18; if (blocked(P.x, P.y)) { P.x -= Math.cos(a) * 18; P.y -= Math.sin(a) * 18; }
       e.px = e.hx; e.py = e.hy; mode = 'play'; return;
     }
-    AUDIO.music('boss'); AUDIO.fx.hit(); shake = 6;
+    AUDIO.music('battle'); AUDIO.fx.hit(); shake = 6;
     const pool = d.questions.filter(q => lessons.includes(q.l) && !q.boss);
     const h0 = S.hearts;
     const p = UI.battle({
@@ -649,7 +665,7 @@
       W.ents = W.ents.filter(x => x !== e);
       burst(e.px, e.py - 8, '#ff8fa0', 20); AUDIO.fx.win();
       let msg = `¡${d.enemy.name} disipado!`;
-      if (S.hearts === h0 && S.lemons < 5) { S.lemons++; msg += ' Respuestas perfectas: +1 🍋'; }
+      if (!res.cheated && S.hearts === h0 && S.lemons < 5) { S.lemons++; msg += ' Sin fallos: +1 limoncito'; }
       UI.toast(msg, 'gold');
       updateGates(); save();
       mode = 'play';
@@ -685,10 +701,29 @@
     AUDIO.music(W.theme.music);
     await fadeTo(1, 500);
     const cp = S.checkpoint && S.checkpoint.phase === W.i ? S.checkpoint : null;
-    P.x = (cp ? cp.x : W.map.start.x) * TS + 8; P.y = (cp ? cp.y : W.map.start.y) * TS + 12; snapCam();
+    P.x = (cp ? cp.x : W.map.start.x) * TS + 8; P.y = (cp ? cp.y : W.map.start.y) * TS + 12; P.dir = 'down'; snapCam();
     S.hearts = S.maxHearts; S.lemons = Math.max(S.lemons, 2);
+    const met = Object.keys(S.chelaSeen).length > 0 || S.rescued;
+    let cart = null;
+    if (!cp) { // Erika todavía no está aquí: llega empujando el carrito, y solo entonces habla
+      cart = { type: 'chela', rescue: true, px: P.x + 150, py: P.y + 2, t: 0 };
+      W.ents.push(cart);
+    }
     await fadeTo(0, 400);
-    await UI.dialog(['¡Ay, mi amor! Se me desmayó del susto. Tome, un ceviche bien frío.', 'Lo que falló queda anotado en su Libreta para repasarlo. Nada se pierde: ¡a intentarlo otra vez!'], { name: 'Doña Chela', portrait: SPR.chelaPortrait() });
+    if (cart) {
+      if (AUDIO.fx.cart) AUDIO.fx.cart();
+      await new Promise(r => { if (AUTO) { cart.px = P.x + 26; r(); return; } const x0 = cart.px, t0 = performance.now(); (function st(n) { const e = Math.min(1, (n - t0) / 1400); cart.px = x0 + (P.x + 26 - x0) * (1 - Math.pow(1 - e, 2)); if (e < 1) requestAnimationFrame(st); else r(); })(t0); });
+    }
+    const lines = met
+      ? ['¡Upe! ¿Otra vez en el suelo, mi amor? Venga, tómese este ceviche bien frío.', 'Lo que falló quedó en su Libreta. Repase la explicación y vuelva a intentarlo.']
+      : ['¡Diay, mae! Lo vi caerse desde la esquina y me vine con todo y carrito. Soy Erika, la de los ceviches en vaso.', 'Tome, uno bien frío, por cuenta de la casa. Lo que falló quedó en su Libreta: repáselo y vuelva con todo.'];
+    S.rescued = true;
+    await UI.dialog(lines, { name: 'Erika Ceviches', portrait: SPR.erikaPortrait() });
+    if (cart) { // se despide y sigue hacia su puesto
+      await new Promise(r => { if (AUTO) { r(); return; } const x0 = cart.px, t0 = performance.now(); (function st(n) { const e = Math.min(1, (n - t0) / 900); cart.px = x0 + 160 * e * e; if (e < 1) requestAnimationFrame(st); else r(); })(t0); });
+      W.ents = W.ents.filter(e => e !== cart);
+      UI.toast('Erika siguió hacia su puesto: ahí puede guardar antes del jefe', 'blue');
+    }
     save(); mode = 'play';
   }
 
@@ -697,39 +732,45 @@
     const first = !S.chelaSeen[id];
     if (first) {
       S.chelaSeen[id] = true;
-      await UI.dialog(d.chela, { name: 'Doña Chela', portrait: SPR.chelaPortrait() });
+      await UI.dialog(d.chela, { name: 'Erika Ceviches', portrait: SPR.erikaPortrait() });
     }
     S.checkpoint = { phase: W.i, x: Math.floor(P.x / TS), y: Math.floor(P.y / TS) };
     save();
-    if (first) UI.toast('💾 Punto de control guardado', 'blue');
+    if (first) UI.toast('Punto de control guardado', 'blue');
     let loop = true, guard = 0;
     while (loop && guard++ < 20) {
-      const pend = Object.keys(S.stats).filter(k => S.stats[k].w > S.stats[k].r && qById[k]);
+      const pend = Object.keys(S.stats).filter(k => S.stats[k].w > 0 && S.stats[k].r <= S.stats[k].w && qById[k]);
       const items = [
-        { label: '🥤 Comer ceviche en vaso', sub: S.hearts < S.maxHearts ? 'Recupera toda la energía' : 'Ya está a tope, pero igual está rico' },
-        { label: '💾 Guardar partida aquí', sub: 'Si se desmaya, vuelve a este puestito' },
-        { label: '🍋 Pedir limoncitos', sub: S.chelaLemon[id] ? 'Ya le di los de esta zona' : '+2 limoncitos (máx. 5): descartan una opción incorrecta', disabled: !!S.chelaLemon[id] || S.lemons >= 5 },
-        { label: `📝 Repasar mis errores (${pend.length})`, sub: pend.length ? 'Preguntas que falló, sin perder energía' : 'No tiene errores pendientes', disabled: !pend.length },
-        { label: '💬 Conversar' },
-        { label: '👋 Seguir' }];
-      const k = await UI.menu('Ceviches “La Transacción”', items, { portrait: SPR.chelaPortrait(), name: 'Doña Chela', text: 'O todo o nada, mi amor. ¿Qué le sirvo?', auto: AUTO ? (guard === 1 ? 0 : 5) : null });
-      if (k === 0) { S.hearts = S.maxHearts; AUDIO.fx.found(); burst(P.x, P.y - 10, '#ff9a5a', 18); UI.toast('❤ Energía al máximo', 'gold'); }
-      else if (k === 1) { S.checkpoint = { phase: W.i, x: Math.floor(P.x / TS), y: Math.floor(P.y / TS) }; UI.toast(save() ? '💾 Partida guardada' : 'No se pudo guardar en este navegador', save() ? 'blue' : 'warn'); }
-      else if (k === 2) { S.lemons = Math.min(5, S.lemons + 2); S.chelaLemon[id] = true; AUDIO.fx.found(); UI.toast('🍋 +2 limoncitos', 'gold'); }
+        { label: 'Comer ceviche en vaso', sub: S.hearts < S.maxHearts ? 'Recupera toda la energía' : 'Ya está a tope, pero igual está rico' },
+        { label: 'Guardar partida aquí', sub: 'Si se queda sin energía, vuelve a este puesto' },
+        { label: 'Pedir limoncitos', sub: S.chelaLemon[id] ? 'Ya le di los de esta zona' : '+2 limoncitos (máx. 5): descartan una opción incorrecta', disabled: !!S.chelaLemon[id] || S.lemons >= 5 },
+        { label: `Repasar mis errores (${pend.length})`, sub: pend.length ? 'Preguntas que falló, sin perder energía' : 'No tiene errores pendientes', disabled: !pend.length },
+        { label: 'Conversar' },
+        { label: 'Seguir' }];
+      const k = await UI.menu('Ceviches “La Transacción”', items, { portrait: SPR.chelaPortrait(), name: 'Erika Ceviches', text: 'Diay, mi amor, o todo o nada. ¿Qué le sirvo?', auto: AUTO ? (guard === 1 ? 0 : 5) : null });
+      if (k === 0) { S.hearts = S.maxHearts; AUDIO.fx.found(); burst(P.x, P.y - 10, '#ff9a5a', 18); UI.toast('Energía al máximo', 'gold'); }
+      else if (k === 1) { S.checkpoint = { phase: W.i, x: Math.floor(P.x / TS), y: Math.floor(P.y / TS) }; UI.toast(save() ? 'Partida guardada' : 'No se pudo guardar en este navegador', save() ? 'blue' : 'warn'); }
+      else if (k === 2) { S.lemons = Math.min(5, S.lemons + 2); S.chelaLemon[id] = true; AUDIO.fx.found(); UI.toast('+2 limoncitos', 'gold'); }
       else if (k === 3) await review(pend);
-      else if (k === 4) await UI.dialog([pickChela()], { name: 'Doña Chela', portrait: SPR.chelaPortrait() });
+      else if (k === 4) await UI.dialog([pickChela()], { name: 'Erika Ceviches', portrait: SPR.erikaPortrait() });
       else loop = false;
     }
     save();
   }
-  const CHELA_EXTRA = ['Mi hijo estudió Informática Empresarial. Dice que lo más difícil es diferenciar la lectura fantasma de la no repetible. ¡Fantasma = filas nuevas!', 'Yo hago respaldo de mi receta todos los domingos: FULL. Y entre semana, solo lo que cambio: diferencial.', 'Cuando se me acaban los vasos, espero a que se libere uno. Eso es un bloqueo, ¿verdad?', 'El secreto del ceviche es el limón. El secreto del examen es leer bien la pregunta.', '¿Sabe qué es un interbloqueo? Cuando yo espero que usted pague y usted espera que yo le sirva.'];
+  const CHELA_EXTRA = [
+    'Mi sobrino estudia en la U. Dice que lo más difícil es diferenciar la fantasma de la no repetible. Fantasma: filas nuevas. ¡Apúntelo!',
+    'Yo respaldo la receta todos los domingos: FULL. Y entre semana, solo lo que cambio: diferencial. Una no nace sabiendo.',
+    'Cuando se me acaban los vasos, espero a que se libere uno. Eso es un bloqueo, ¿verdad? Yo le digo “esperar el turno”.',
+    'El secreto del ceviche es limón fresco y no dejar transacciones abiertas. Lo segundo me lo dijo un cliente; yo ni sé qué es.',
+    'Si uno me pide sin cebolla y otro con doble cebolla al mismo tiempo, los atiendo serializable: uno y después el otro. Pura vida.',
+    'El profe Mauricio pasa por aquí los viernes. Pide uno grande y se pone a revisar exámenes. Qué miedo, mae.'];
   const pickChela = () => CHELA_EXTRA[Math.floor(Math.random() * CHELA_EXTRA.length)].concat('');
 
   async function review(ids) {
     const list = LOGIC.shuffle(ids).slice(0, 5).map(id => qById[id]);
     let k = 0;
     const p = UI.battle({
-      name: 'Repaso con Doña Chela', sprite: SPR.chela(), hp: list.length, state: S, safe: true, tag: 'REPASO SIN RIESGO',
+      name: 'Repaso con Erika', sprite: SPR.erika(), hp: list.length, state: S, safe: true, tag: 'REPASO SIN RIESGO',
       taunt: 'Tranquilo, aquí no se pierde energía.',
       nextQuestion: () => list[k++] || list[list.length - 1],
       lessonOf: q => lessonById[q.l], onAnswer: statAnswer,
@@ -779,7 +820,7 @@
       }
       S.finalAct = a + 1; S.hearts = Math.min(S.maxHearts, S.hearts + 2); save();
       AUDIO.fx.win(); shake = 10;
-      if (a < F.acts.length - 1) UI.toast(`✔ ${act.title} superado · +2 ❤`, 'gold');
+      if (a < F.acts.length - 1) UI.toast(`${act.title} superado · +2 de energía`, 'gold');
     }
     S.done = true; save();
     AUDIO.music('win');
@@ -800,7 +841,7 @@
   async function phaseIntro(i) {
     const d = PH[i];
     const num = d.num ? `FASE ${d.num}` : 'FINAL';
-    await UI.card(`<span class="ph-num">${num}</span>${UI.esc(d.name)}`, `<p class="ph-place">${UI.esc(d.place)}</p><p class="ph-src">📚 ${UI.esc(d.source)}</p>${d.story.map(s => `<p>${UI.esc(s)}</p>`).join('')}
+    await UI.card(`<span class="ph-num">${num}</span>${UI.esc(d.name)}`, `<p class="ph-place">${UI.esc(d.place)}</p><p class="ph-src">${UI.esc(d.source)}</p>${d.story.map(s => `<p>${UI.esc(s)}</p>`).join('')}
       ${d.lessons ? `<div class="ph-topics"><b>Temas de esta fase</b><ul>${d.lessons.map(l => `<li>${UI.esc(l.title)}</li>`).join('')}</ul></div>` : ''}`, '¡Vamos!', 'phase-card');
   }
 
@@ -812,7 +853,7 @@
     loadPhase(i, opt);
     await fadeTo(0, 400);
     if (!opt.quiet) await phaseIntro(i);
-    if (PH[i].id === 'final' && !S.chelaSeen.final) UI.toast('Doña Chela también tiene puestito en la Torre', 'blue');
+    if (PH[i].id === 'final' && !S.chelaSeen.final) UI.toast('Erika también tiene puestito en la Torre', 'blue');
     mode = 'play';
     save();
   }
@@ -824,9 +865,9 @@
     let r = 0, w = 0; d.questions.forEach(q => { const s = S.stats[q.id]; if (s) { r += s.r; w += s.w; } });
     const pct = r + w ? Math.round(100 * r / (r + w)) : 0;
     await fadeTo(1, 400);
-    await UI.card(`⭐ Fase ${d.num} completada`, `<p><b>${UI.esc(d.name)}</b></p><p>Precisión en esta fase: <b>${pct} %</b> (${r} correctas, ${w} por mejorar).</p>
+    await UI.card(`Fase ${d.num} completada`, `<p><b>${UI.esc(d.name)}</b></p><p>Precisión en esta fase: <b>${pct} %</b> (${r} correctas, ${w} por mejorar).</p>
       <p>Temas dominados:</p><ul>${d.lessons.map(l => `<li>${UI.esc(l.title)}</li>`).join('')}</ul>
-      ${w ? '<p>Sus errores quedaron guardados: el Profe Mauricio y Doña Chela se los volverán a preguntar.</p>' : '<p>¡Sin errores! Impresionante.</p>'}`, 'Siguiente', 'phase-card');
+      ${w ? '<p>Sus errores quedaron guardados: el Profe Mauricio y Erika se los volverán a preguntar.</p>' : '<p>¡Sin errores! Impresionante.</p>'}`, 'Siguiente', 'phase-card');
     S.checkpoint = null;
     const next = W.i + 1;
     if (next <= FINAL_IDX) { S.unlocked = Math.max(S.unlocked, next + 1); await enterPhase(next); }
@@ -837,23 +878,69 @@
     await fadeTo(1, 800);
     let r = 0, w = 0; Object.values(S.stats).forEach(s => { r += s.r; w += s.w; });
     const per = CONTENT.phases.map(p => { let a = 0, b = 0; p.questions.forEach(q => { const s = S.stats[q.id]; if (s) { a += s.r; b += s.w; } }); return `<li>Fase ${p.num} · ${UI.esc(p.name)}: ${a + b ? Math.round(100 * a / (a + b)) : 0} %</li>`; }).join('');
-    await UI.card('🌅 Amanece en Puerto Nightdare', `<p>El Servidor Central está encendido. Los trenes van en orden, la bóveda tiene respaldos, el mercado usa índices y las islas están sincronizadas.</p>
+    await UI.card('Amanece en Puerto Nyder', `<p>El Servidor Central está encendido. Los trenes van en orden, la bóveda tiene respaldos, el mercado usa índices y las islas están sincronizadas.</p>
       <p><b>Resultado global:</b> ${r} respuestas correctas y ${w} por repasar (${r + w ? Math.round(100 * r / (r + w)) : 0} %).</p><ul>${per}</ul>
-      <p>Tiempo de juego: ${Math.round(S.playMs / 60000)} min.</p><p class="credits">Una aventura de <b>NIGHTDARE GAMES</b><br>Contenido: Guías #8 a #13 y Resumen de las investigaciones · IF0010 Bases de Datos II<br>Sonidos y logo: proyecto Five Doors at Freddy's (dreiklx)</p>
+      <p>Tiempo de juego: ${Math.round(S.playMs / 60000)} min.</p><p class="credits">Una aventura de <b>NYDER GAMES</b><br>Contenido: Guías #8 a #13 y Resumen de las investigaciones · IF0010 Bases de Datos II<br>Sonidos y logo: proyecto Five Doors at Freddy's (dreiklx)</p>
       <p>¡Mucha suerte en el examen! Puede volver a cualquier fase desde el menú para repasar.</p>`, 'Volver al título', 'phase-card');
     if (!AUTO) await toTitle();
   }
 
   /* ======================= Título y menús ======================= */
   const titleEl = document.getElementById('title');
+  /* Presentación de NYDER Games: misma secuencia que el juego de FNAF del repo
+     (250 ms negro, 800 de entrada, 1300 visible con destello en la estrella, 650 de salida). */
   async function splash() {
-    const sp = document.getElementById('splash');
-    sp.hidden = false; AUDIO.fx.sparkle();
-    await UI.wait(2600);
-    sp.classList.add('out'); await UI.wait(500); sp.hidden = true;
+    const sp = document.getElementById('splash'), cv = document.getElementById('splash-cv'), x = cv.getContext('2d');
+    sp.hidden = false; sp.classList.remove('out');
+    const img = new Image(); img.src = 'assets/img/nyder_games_splash.png';
+    await new Promise(r => { if (img.complete) r(); img.onload = r; img.onerror = r; });
+    if (AUTO || !img.naturalWidth) { sp.hidden = true; return; }
+    const IW = img.naturalWidth, IH = img.naturalHeight, w = cv.width * 0.62, h = w * IH / IW, ox = (cv.width - w) / 2, oy = (cv.height - h) / 2, k = w / IW;
+    // máscara de la estrella violeta, generada en memoria desde el propio PNG (si el navegador lo permite)
+    let mask = null;
+    try {
+      const c2 = document.createElement('canvas'); c2.width = IW; c2.height = IH; const g2 = c2.getContext('2d'); g2.drawImage(img, 0, 0);
+      const d = g2.getImageData(0, 0, IW, IH), px = d.data;
+      for (let i = 0; i < px.length; i += 4) { const r = px[i], gg = px[i + 1], bb = px[i + 2]; if (px[i + 3] > 0 && bb > r + 40 && bb > gg + 40) { px[i] = 236; px[i + 1] = 228; px[i + 2] = 255; } else px[i + 3] = 0; }
+      g2.putImageData(d, 0, 0); mask = c2;
+    } catch (e) { mask = null; }
+    const SX = ox + 1080 * k, SY = oy + 262 * k; // centro de la estrella
+    const T_BLACK = 250, T_IN = 800, T_SHOW = 1300, T_OUT = 650, t0 = performance.now();
+    let sparkled = false, skip = false;
+    const onSkip = () => { skip = true; };
+    sp.addEventListener('click', onSkip); window.addEventListener('keydown', onSkip, { once: true });
+    await new Promise(done => {
+      (function frame(now) {
+        const t = now - t0;
+        x.fillStyle = '#000'; x.fillRect(0, 0, cv.width, cv.height);
+        let a = 0;
+        if (t < T_BLACK) a = 0; else if (t < T_BLACK + T_IN) a = (t - T_BLACK) / T_IN; else if (t < T_BLACK + T_IN + T_SHOW) a = 1; else a = Math.max(0, 1 - (t - T_BLACK - T_IN - T_SHOW) / T_OUT);
+        x.globalAlpha = a; x.drawImage(img, ox, oy, w, h);
+        // destello: espera 120 ms, sube 420 (cuadrática), se sostiene 60, se apaga 600
+        const ts = t - (T_BLACK + T_IN) - 120;
+        let br = 0;
+        if (ts >= 0 && ts < 420) br = Math.pow(ts / 420, 2); else if (ts >= 420 && ts < 480) br = 1; else if (ts >= 480 && ts < 1080) br = 1 - (ts - 480) / 600;
+        if (ts >= 160 && !sparkled) { sparkled = true; AUDIO.fx.sparkle(); }
+        if (br > 0) {
+          if (mask) { x.globalAlpha = a * br; x.drawImage(mask, ox, oy, w, h); }
+          const R = 140 * k * 2.2, gr = x.createRadialGradient(SX, SY, 0, SX, SY, R);
+          gr.addColorStop(0, `rgba(230,215,255,${0.55 * br})`); gr.addColorStop(1, 'rgba(180,140,255,0)');
+          x.globalAlpha = a; x.fillStyle = gr; x.beginPath(); x.arc(SX, SY, R, 0, 7); x.fill();
+          if (br > 0.55) { // chispazo de cuatro puntas cerca del pico
+            const L = 30 + 110 * br; x.globalAlpha = a * (br - 0.55) / 0.45; x.fillStyle = '#fff';
+            x.beginPath(); x.moveTo(SX, SY - L); x.lineTo(SX + 3, SY); x.lineTo(SX, SY + L); x.lineTo(SX - 3, SY); x.closePath(); x.fill();
+            x.beginPath(); x.moveTo(SX - L, SY); x.lineTo(SX, SY + 3); x.lineTo(SX + L, SY); x.lineTo(SX, SY - 3); x.closePath(); x.fill();
+          }
+        }
+        x.globalAlpha = 1;
+        if (skip || t >= T_BLACK + T_IN + T_SHOW + T_OUT) done(); else requestAnimationFrame(frame);
+      })(performance.now());
+    });
+    sp.removeEventListener('click', onSkip); window.removeEventListener('keydown', onSkip);
+    sp.hidden = true;
   }
   async function toTitle() {
-    mode = 'title'; W = null; fade = 0;
+    mode = 'title'; W = null; fade = 0; AUDIO.ambient(null);
     document.getElementById('hud').hidden = true;
     AUDIO.music('title');
     titleEl.hidden = false;
@@ -864,7 +951,8 @@
       { label: 'Elegir fase (repaso)', sub: saved && saved.unlocked > 1 ? 'Vuelva a cualquier fase desbloqueada' : 'Se desbloquean al vencer a cada jefe', disabled: !(saved && saved.unlocked > 1) },
       { label: 'Cómo jugar' },
       { label: 'Material del curso' },
-      { label: AUDIO.isMuted() ? 'Sonido: apagado' : 'Sonido: encendido' }];
+      { label: AUDIO.isMuted() ? 'Sonido: apagado' : 'Sonido: encendido' },
+      { label: 'Copia de seguridad', sub: 'Exportar o importar su avance (.json)' }];
     const k = await UI.menu('Menú', items, { cls: 'title-menu', cancel: false });
     if (k === 0) {
       if (saved) { const c = await UI.menu('¿Empezar de cero?', [{ label: 'Sí, nueva partida', sub: 'Se borra el progreso guardado' }, { label: 'No, volver' }]); if (c !== 0) return toTitle(); }
@@ -880,36 +968,47 @@
     if (k === 3) { await howTo(); return toTitle(); }
     if (k === 4) { await material(); return toTitle(); }
     if (k === 5) { AUDIO.toggleMute(); return toTitle(); }
+    if (k === 6) { await backupMenu(); return toTitle(); }
     return toTitle();
   }
   async function story() {
     titleEl.hidden = true;
-    await UI.dialog(['Puerto Nightdare. 11:57 p. m.', 'Usted es Kai, pasante del turno de noche en el centro de datos del puerto.', 'A las 11:58 cae un rayo. El Gran Apagón corrompe la base de datos central: transacciones a medias, trenes de datos enredados, respaldos perdidos, consultas lentísimas y nodos a la deriva.', 'La radio chisporrotea...'], { name: 'Narrador' });
-    await UI.dialog(['Kai, ¿me copia? Habla Mauricio, desde la Torre del Servidor.', 'Hay que restaurar cinco núcleos antes del amanecer. En cada zona hay pizarras con lo que necesita saber: léalas con calma.', 'Cuando termine, suba a la Torre. Yo mismo voy a revisar que todo quedó bien.'], { name: 'Profe Mauricio (radio)', portrait: SPR.mauPortrait() });
+    await UI.dialog(['Puerto Nyder. 11:57 p. m.', 'Usted es Kai, pasante del turno de noche en el centro de datos del puerto.', 'A las 11:58 cae un rayo. El Gran Apagón corrompe la base de datos central: transacciones a medias, trenes de datos enredados, respaldos perdidos, consultas lentísimas y nodos a la deriva.', 'En el muelle, Erika Ceviches abre su carrito de ceviche en vaso, como todas las noches. Dicen que ni el apagón la hace cerrar.', 'La radio chisporrotea...'], { name: 'Narrador' });
+    await UI.dialog(['Kai, ¿me copia? Habla Mauricio, desde la Torre del Servidor.', 'Hay que restaurar cinco núcleos antes del amanecer. En cada zona hay enseñanzas con lo que necesita saber: véalas con calma, que después se lo pregunto.', 'Cuando termine, suba a la Torre. Yo mismo voy a revisar que todo quedó bien.'], { name: 'Profe Mauricio (radio)', portrait: SPR.mauPortrait() });
   }
   async function howTo() {
     await UI.card('Cómo jugar', `<ul class="howto">
-      <li><kbd>WASD</kbd> / <kbd>flechas</kbd>: moverse · <kbd>Shift</kbd>: correr</li>
-      <li><kbd>E</kbd> / <kbd>Espacio</kbd>: hablar, leer pizarras, usar pruebas</li>
-      <li><kbd>L</kbd>: Libreta de estudio · <kbd>M</kbd>: sonido · <kbd>Esc</kbd>: pausa</li>
-      <li>En los retos: <kbd>1</kbd>-<kbd>4</kbd> responder · <kbd>H</kbd> pista · <kbd>J</kbd> limoncito · <kbd>K</kbd> ver la pizarra</li></ul>
-      <p><b>Ritmo de cada fase (12 a 18 min):</b> hable con el guía → lea las pizarras → venza a los enemigos y supere las pruebas → visite a Doña Chela → enfrente al jefe.</p>
-      <p>Las preguntas salen solo de las pizarras que ya leyó. Si se equivoca, verá la explicación y esa pregunta volverá más adelante para reforzarla. Si se queda sin energía, Doña Chela lo recoge: no pierde lo aprendido.</p>
-      <p>🍋 Los <b>limoncitos</b> descartan una opción incorrecta. Se ganan con Doña Chela o respondiendo un reto sin errores.</p>`, 'Entendido');
+      <li><b>Computadora:</b> <kbd>WASD</kbd>/<kbd>flechas</kbd> moverse · <kbd>Shift</kbd> correr · <kbd>E</kbd>/<kbd>Espacio</kbd> hablar o usar · <kbd>L</kbd> Libreta · <kbd>M</kbd> sonido · <kbd>Esc</kbd> pausa</li>
+      <li><b>Teléfono:</b> joystick a la izquierda, botón <b>A</b> para hablar y continuar, <b>Correr</b> para ir más rápido. Toque las respuestas.</li>
+      <li><b>Combates:</b> responda bien y Kai ataca; si falla, el enemigo ataca, ve por qué y esa pregunta vuelve en el mismo combate. <kbd>1</kbd>-<kbd>4</kbd> responder · <kbd>H</kbd> pista · <kbd>J</kbd> limoncito · <kbd>K</kbd> pizarra.</li></ul>
+      <p><b>Cada fase:</b> hablar con el guía → ver las enseñanzas (video narrado + pizarra) → vencer enemigos y superar pruebas → pasar por Erika Ceviches → jefe. Arriba a la derecha siempre dice qué falta.</p>
+      <p>Solo le preguntan lo que ya vio. Si se queda sin energía, Erika lo recoge y no pierde lo avanzado. Los <b>limoncitos</b> descartan una opción incorrecta.</p>`, 'Entendido');
   }
   async function material() {
     await UI.card('Material del curso usado', `<p>Todo el contenido sale de la carpeta <code>Bases Examen 3</code> (IF0010 Bases de Datos II):</p><ul>
       ${CONTENT.phases.map(p => `<li><b>Fase ${p.num}:</b> ${UI.esc(p.source)}</li>`).join('')}</ul>
       <p><b>Notas:</b></p><ul>${CONTENT.notes.map(n => `<li>${UI.esc(n)}</li>`).join('')}</ul>`, 'Volver');
   }
+  async function backupMenu() {
+    const c = await UI.menu('Copia de seguridad', [
+      { label: 'Exportar mi avance', sub: 'Descarga un archivo .json para guardarlo donde quiera' },
+      { label: 'Importar una copia', sub: 'Reemplaza el avance de este dispositivo' },
+      { label: 'Volver' }]);
+    if (c === 0) { const r = SAVEIO.exportFile(); await UI.card('Copia de seguridad', `<p>${UI.esc(r.msg)}</p>`, 'Volver'); }
+    else if (c === 1) {
+      const ok = await UI.menu('¿Reemplazar el avance actual?', [{ label: 'Sí, elegir archivo' }, { label: 'No' }]);
+      if (ok === 0) { const r = await SAVEIO.importFile(); await UI.card('Copia de seguridad', `<p>${UI.esc(r.msg)}</p>`, 'Volver'); }
+    }
+  }
   async function pauseMenu() {
     if (mode !== 'play' || UI.busy()) return;
     mode = 'busy';
-    const k = await UI.menu('Pausa', [{ label: 'Continuar' }, { label: 'Libreta de estudio' }, { label: 'Cómo jugar' }, { label: AUDIO.isMuted() ? 'Activar sonido' : 'Silenciar' }, { label: 'Guardar y volver al título' }]);
+    const k = await UI.menu('Pausa', [{ label: 'Continuar' }, { label: 'Libreta de estudio' }, { label: 'Cómo jugar' }, { label: AUDIO.isMuted() ? 'Activar sonido' : 'Silenciar' }, { label: 'Guardar y volver al título' }, { label: 'Guardar y exportar copia', sub: 'Descarga un .json con su avance' }]);
     if (k === 1) await UI.notebook(S, W.def.id);
     else if (k === 2) await howTo();
     else if (k === 3) { AUDIO.toggleMute(); updateHud(true); }
     else if (k === 4) { save(); mode = 'busy'; await fadeTo(1, 300); await toTitle(); return; }
+    else if (k === 5) { save(); const r = SAVEIO.exportFile(); UI.toast(r.msg, r.ok ? 'blue' : 'warn'); }
     mode = 'play';
   }
 
@@ -920,13 +1019,15 @@
     if (!W || mode === 'title') { hud.hidden = true; return; }
     hud.hidden = false;
     const ob = objective();
-    const key = [W.i, S.hearts, S.lemons, ob.text, AUDIO.isMuted()].join('|');
+    const key = [W.i, S.hearts, S.lemons, ob.text, JSON.stringify(ob.list || []), AUDIO.isMuted()].join('|');
     if (!force && key === hudCache) return; hudCache = key;
     document.getElementById('hud-phase').textContent = W.def.num ? `F${W.def.num} · ${W.def.name}` : W.def.name;
     document.getElementById('hud-hearts').innerHTML = Array.from({ length: S.maxHearts }, (_, i) => `<i class="heart ${i < S.hearts ? '' : 'empty'}"></i>`).join('');
-    document.getElementById('hud-lemons').textContent = '🍋 ' + S.lemons;
+    document.getElementById('hud-lemons').innerHTML = `<i class="lemon"></i>${S.lemons}`;
     document.getElementById('hud-obj').textContent = ob.text;
-    document.getElementById('btn-sound').textContent = AUDIO.isMuted() ? '🔇' : '🔊';
+    const cl = document.getElementById('hud-list');
+    if (cl) cl.innerHTML = ob.list && ob.list.length ? `<div class="cl-head">${UI.esc(ob.head || '')}</div>` + ob.list.map(x => `<div class="cl ${x.done ? 'done' : ''}"><i></i>${UI.esc(x.t)}</div>`).join('') : '';
+    document.getElementById('btn-sound').classList.toggle('off', AUDIO.isMuted());
   }
 
   /* ======================= Entrada ======================= */
@@ -997,6 +1098,10 @@
     else if (ui.startsWith('mg:')) MINI.run(ui.slice(3));
     else if (ui === 'title') { W = null; mode = 'title'; titleEl.hidden = false; UI.menu('Menú', [{ label: 'Nueva partida' }, { label: 'Continuar' }, { label: 'Elegir fase (repaso)' }, { label: 'Cómo jugar' }], { cls: 'title-menu' }); }
     else if (ui === 'notebook') UI.notebook(S, W.def.id);
+    else if (ui.startsWith('video:')) { const [, vid, b, st] = ui.split(':'); VIDEO.play(vid, { title: (lessonById[vid] || {}).title, tag: 'Enseñanza', beat: +b || 0, start: st, freeze: params.get('freeze') ? +params.get('freeze') : 0 }); }
+    else if (ui === 'faint') faint();
+    else if (ui === 'splash') splash();
+    else if (ui === 'hud') updateHud(true);
   }
 
   /* ======================= Prueba automática ======================= */
@@ -1031,7 +1136,7 @@
         await interact(W.ents.find(e => e.type === 'mg' && e.idx === 1));
         if (!W.gatesOpen.has(3)) throw new Error(d.id + ': la puerta 3 no abrió');
         step(d.id + ' chela'); await interact(find('chela')[0]);
-        if (!S.checkpoint) throw new Error('Doña Chela no guardó el punto de control');
+        if (!S.checkpoint) throw new Error('Erika no guardó el punto de control');
         S.hearts = S.maxHearts;
         step(d.id + ' jefe'); await interact(find('boss')[0]);
         if (!S.boss[d.boss.id]) throw new Error(d.id + ': el jefe no fue derrotado');
@@ -1040,8 +1145,8 @@
         const st = d.questions.reduce((a, q) => { const s = S.stats[q.id]; return a + (s ? s.r + s.w : 0); }, 0);
         log.push(`${d.id}: OK · pizarras ${d.lessons.filter(l => S.read[l.id]).length}/${d.lessons.length} · enemigos ${Object.keys(S.defeated[d.id]).length}/6 · pruebas ${d.minigames.filter(m => S.mg[m]).join('+')} · jefe ✔ · respuestas registradas ${st}`);
       }
-      // repaso de errores con Doña Chela (sin perder energía)
-      const pend = Object.keys(S.stats).filter(k => S.stats[k].w > S.stats[k].r);
+      // repaso de errores con Erika (sin perder energía)
+      const pend = Object.keys(S.stats).filter(k => S.stats[k].w > 0 && S.stats[k].r <= S.stats[k].w);
       const h0 = S.hearts; await review(pend.slice(0, 3)); if (S.hearts !== h0) throw new Error('El repaso quitó energía');
       log.push(`Repaso de errores: ${Math.min(3, pend.length)} preguntas sin perder energía OK`);
       loadPhase(FINAL_IDX); mode = 'play';

@@ -17,16 +17,16 @@ const P = [];
 P.push({
   id: 'p1', num: 1, theme: 'muelle',
   name: 'Muelle de las Transacciones',
-  place: 'Puerto Nightdare · 11:58 p. m.',
+  place: 'Puerto Nyder · 11:58 p. m.',
   source: 'Guía #8 · Concurrencia · Resumen §2',
   story: [
-    'Medianoche en el Puerto Nightdare. El Gran Apagón dejó los barcos a medio descargar.',
+    'Medianoche en el Puerto Nyder. El Gran Apagón dejó los barcos a medio descargar.',
     'Si se descargan la mitad de las cajas y se va la luz... ¿qué quedó guardado y qué no? Para eso existen las transacciones.'
   ],
   npc: { name: 'Capitana Marea', sprite: 'guide', tint: '#2bb3c0', lines: [
-    '¡Grumete Kai! Los Bichos Sucios se están comiendo la carga que todavía no se confirma.',
-    'Aquí nadie pelea sin saber: lea las tres pizarras brillantes del almacén. Cuando las lea, la grúa abre el muelle.',
-    'Truco de capitana: si se le olvida algo, abra la Libreta con la tecla L.'
+    '¡Upe, grumete Kai! Los Bichos Sucios se están jalando la carga que todavía no tiene COMMIT.',
+    'Aquí nadie se mete a pelear a lo loco: vea las pizarras brillantes del almacén, que traen video. Cuando las vea, la grúa abre el muelle.',
+    'Si se le olvida algo, abra la Libreta con la L. Ahí queda todo, mae.'
   ]},
   lessons: [
     { id: 'p1l1', title: 'Transacción y propiedades ACID', src: 'Guía #8',
@@ -215,9 +215,9 @@ SELECT * FROM pedidos WHERE cliente_id = 5; -- fila nueva`,
   ],
   enemy: { name: 'Bicho Sucio', sprite: 'mudbug' },
   boss: { id: 'b1', name: 'Pirata Lectosucio', sprite: 'pirate', hp: 6,
-    intro: ['¡Jarrr! Yo leo la carga ANTES de que la confirmen. ¿Y qué si después hacen ROLLBACK?', 'Si sabe tanto de transacciones, ¡demuéstrelo!'],
-    win: ['¡Arrr! Leer sin confirmar... mala idea. Me rindo, me voy a READ COMMITTED.'] },
-  chela: ['¡Ceviche en vaso, mi amor! Atómico: o se lo come todo o no se come nada.', 'Aquí le guardo la partida. Es durable: ni con apagón se pierde.'],
+    intro: ['¡Jarrr! Yo leo la carga ANTES de que la confirmen. ¿Y qué si después hacen ROLLBACK?', 'Si tan carga es con las transacciones, ¡demuéstrelo!'],
+    win: ['¡Diay, me ganó! Leer sin confirmar... qué mala idea. Me paso a READ COMMITTED.'] },
+  chela: ['¡Upe, mi amor! Ceviche en vaso, atómico: o se lo come todo o no se come nada.', 'Aquí le guardo la partida. Es durable: ni con apagón se pierde, se lo juro por mi carrito.'],
   minigames: ['crane', 'sorter']
 });
 
@@ -234,9 +234,9 @@ P.push({
     'Para desenredarlos hay que entender las planificaciones: qué operaciones chocan, qué orden es seguro y quién espera a quién.'
   ],
   npc: { name: 'Jefa de Estación Agujas', sprite: 'guide', tint: '#e0a030', lines: [
-    '¡Cuidado con los trenes! Cuando parpadea la luz roja, no se pare en la vía.',
-    'Los Cerrojos Errantes se alimentan de planes no serializables. Lea las pizarras antes de acercarse.',
-    'Y aprenda la notación: l1(X) es “T1 lee X”, e1(X) es “T1 escribe X”.'
+    '¡Cuidado con los trenes! Cuando parpadea la luz roja, no se quede en la vía como poste.',
+    'Los Cerrojos Errantes comen planes no serializables. Vea las pizarras antes de arrimarse.',
+    'La notación es sencilla: l1(X) es “T1 lee X” y e1(X) es “T1 escribe X”. No se me enrede.'
   ]},
   lessons: [
     { id: 'p2l1', title: 'Planificaciones: serie, no serie y serializable', src: 'Guía #9',
@@ -397,9 +397,9 @@ P.push({
   ],
   enemy: { name: 'Cerrojo Errante', sprite: 'lockbug' },
   boss: { id: 'b2', name: 'Locomotora Interbloqueo', sprite: 'train', hp: 6,
-    intro: ['¡CHUU-CHUU! Yo retengo la vía A y espero la B. Mi otra cabeza retiene la B y espera la A.', '¿Quién será la víctima? ¡Responda o quedamos aquí para siempre!'],
+    intro: ['¡CHUU-CHUU! Yo retengo la vía A y espero la B. Mi otra cabeza retiene la B y espera la A.', 'Diay, ¿quién será la víctima? ¡Responda o nos quedamos aquí hasta mañana!'],
     win: ['Error 1205... fui elegida como víctima. ¡Liberando bloqueos!'] },
-  chela: ['Aquí no hay deadlock, mi amor: usted agarra el vaso y yo agarro la plata. Siempre en el mismo orden.', 'Le guardo la partida en un plan serie: primero usted, después la limonada.'],
+  chela: ['Aquí no hay deadlock, mi amor: usted agarra el vaso y yo agarro la plata. Siempre en el mismo orden.', 'Le guardo la partida en un plan serie: primero usted y después la fila, que está larguísima.'],
   minigames: ['graph', 'locks']
 });
 
@@ -416,9 +416,9 @@ P.push({
     'Sin respaldos no hay recuperación. Y sin seguridad, cualquiera entra a la bóveda. Encienda la linterna.'
   ],
   npc: { name: 'Guardián Respaldo', sprite: 'guide', tint: '#8a7cff', lines: [
-    '¡Llegó justo! La tormenta corrompió la base y los Rayos Corruptos andan sueltos.',
-    'Con la linterna solo ve cerca. Las pizarras brillan: búsquelas.',
-    'Aquí se aprende a respaldar, a restaurar y a cerrar bien las puertas.'
+    '¡Llegó justo, mae! La tormenta corrompió la base y los Rayos Corruptos andan sueltos.',
+    'Con la linterna solo ve cerquita. Las pizarras brillan: búsquelas.',
+    'Aquí se aprende a respaldar, a restaurar y a cerrar bien la bóveda. Nada de dejar la puerta abierta.'
   ]},
   lessons: [
     { id: 'p3l1', title: 'Respaldo, recuperación y tipos de fallas', src: 'Guía #10',
@@ -573,7 +573,7 @@ RESTORE DATABASE BARES FROM DISK = 'C:\\RESPALDO\\BARES_FULL.BAK' WITH RECOVERY,
   enemy: { name: 'Rayo Corrupto', sprite: 'cloud' },
   boss: { id: 'b3', name: 'Tormenta Corrupta', sprite: 'storm', hp: 6,
     intro: ['¡KRA-KOOOM! Partí el disco en mil pedazos. ¿Tiene su FULL? ¿Su DIFFERENTIAL? ¿Sus LOG en orden?', 'Y si no cerró bien la bóveda, ¡me llevo los salarios!'],
-    win: ['¡Nooo! Restauró hasta el último LOG... La tormenta se disipa.'] },
+    win: ['¡Puta, restauró hasta el último LOG! La tormenta se disipa...'] },
   chela: ['Este limón es mi respaldo FULL y las galletas son el diferencial. Nunca salgo sin los dos.', '¿Mi receta? Cifrada con AES-256. Ni mi comadre la ve: le sale enmascarada.'],
   minigames: ['restore', 'keys']
 });
@@ -591,9 +591,9 @@ P.push({
     'Aquí se aprende a pedir solo lo necesario, a usar índices y a no hacer mil viajes por lo mismo.'
   ],
   npc: { name: 'Pulpero Índice', sprite: 'guide', tint: '#59c35b', lines: [
-    '¡Bienvenido al mercado! Aquí el que sabe dónde buscar llega primero.',
-    'Los clientes del mercado dan consejos: hábleles. Y lea las pizarras antes de enfrentar a las Babosas Scan.',
-    'Hoy aprende optimización, ORMs, caché con Redis y hasta minería de procesos.'
+    '¡Bienvenido al mercado! Aquí el que sabe dónde buscar llega primero... y el que no, hace fila.',
+    'Los clientes dan consejos: hábleles. Y vea las pizarras antes de toparse a las Babosas Scan.',
+    'Hoy toca optimización, ORMs, caché con Redis y hasta minería de procesos. Es un brete, pero sale.'
   ]},
   lessons: [
     { id: 'p4l1', title: 'Cómo optimiza un SGBD', src: 'Guía #11',
@@ -770,7 +770,7 @@ P.push({
   boss: { id: 'b4', name: 'El Gran Full Scan', sprite: 'beetle', hp: 6,
     intro: ['Fiiila... por... fiiila... Yo leo TODO el mercado. ¿Índices? Para qué, si tengo tiempo.', 'SELECT * de la vida. ¡Pruebe que sabe hacerlo mejor!'],
     win: ['¿Index... Seek? Así se llega directo... Me voy a actualizar mis estadísticas.'] },
-  chela: ['Mi ceviche tiene índice: el culantro siempre arriba, para que lo encuentre de un solo Seek.', '¿Caché? Ya tengo cinco vasitos servidos. Hit seguro, mi amor.'],
+  chela: ['Mi ceviche tiene índice: el culantro siempre arriba, para que lo encuentre de un solo Seek.', '¿Caché? Ya tengo cinco vasitos servidos en la vitrina. Hit seguro, mi amor.'],
   minigames: ['rewrite', 'cache']
 });
 
@@ -787,9 +787,9 @@ P.push({
     'Para cruzar hay que entender la fragmentación, la replicación, el commit en dos fases y los documentos de MongoDB.'
   ],
   npc: { name: 'Navegante Nodo', sprite: 'guide', tint: '#3fa9f5', lines: [
-    '¡Ahoy! Los puentes entre islas aparecen cuando cada nodo se sincroniza.',
+    '¡Upe! Los puentes entre islas aparecen cuando cada nodo se sincroniza.',
     'Esas placas brillantes del suelo son servidores vinculados: lo llevan de una isla a otra.',
-    'Las Medusas Nodo pican si no sabe dónde están los datos. Lea antes de nadar... digo, de pelear.'
+    'Las Medusas Nodo pican si no sabe dónde están los datos. Vea las pizarras antes de nadar... digo, de pelear.'
   ]},
   lessons: [
     { id: 'p5l1', title: 'Bases de datos distribuidas', src: 'Guía #12',
@@ -956,8 +956,8 @@ db.cursos.find({ $or: [ { profesor: "Ana" }, { profesor: "Carlos" } ] })`,
   enemy: { name: 'Medusa Nodo', sprite: 'jelly' },
   boss: { id: 'b5', name: 'Kraken Fragmentado', sprite: 'kraken', hp: 6,
     intro: ['¡Cada tentáculo guarda un fragmento! Uno tiene las filas de Limón, otro las columnas de salarios...', '¿Sabe reunirme sin perder la consistencia? ¡Prepárese... y luego confirme!'],
-    win: ['Todos los nodos votaron... ¡COMMIT! Me reintegro en una sola base.'] },
-  chela: ['Tengo replicación total: un puestito igualito en cada isla. Transparencia de localización, ¿vio?', 'Esquema flexible: hoy le pongo mango al ceviche y mañana no. MongoDB style.'],
+    win: ['¡Qué mierda! Todos los nodos votaron COMMIT... Me reintegro en una sola base.'] },
+  chela: ['Tengo replicación total: un puestito igualito en cada isla. Transparencia de localización, ¿vio?', 'Esquema flexible: hoy le pongo mango al ceviche y mañana no. Al estilo MongoDB.'],
   minigames: ['cut', 'mql']
 });
 
@@ -967,7 +967,7 @@ db.cursos.find({ $or: [ { profesor: "Ana" }, { profesor: "Carlos" } ] })`,
 const FINAL = {
   id: 'final', theme: 'torre',
   name: 'Torre del Servidor Central',
-  place: 'Torre Nightdare · 4:45 a. m.',
+  place: 'Torre Nyder · 4:45 a. m.',
   source: 'Repaso de todas las fases',
   story: [
     'Los cinco núcleos están restaurados. Solo falta volver a encender el Servidor Central, en lo alto de la Torre.',
@@ -976,20 +976,20 @@ const FINAL = {
   boss: { id: 'bf', name: 'Profe Mauricio', sprite: 'mauricio', perPhase: 3,
     acts: [
       { title: 'Acto I · Transacciones y planificación', phases: ['p1', 'p2'],
-        intro: ['Buenas noches, Kai. Bien hecho con los núcleos.', 'Pero el servidor no se enciende con suerte: se enciende con conceptos claros. Empecemos por lo básico: transacciones y planificación.'] },
+        intro: ['Buenas noches, Kai. Bien hecho con los núcleos.', 'Pero el servidor no se enciende con suerte: se enciende con conceptos claros. Arranquemos por transacciones y planificación.'] },
       { title: 'Acto II · Respaldo y optimización', phases: ['p3', 'p4'],
-        intro: ['Nada mal. Ahora, si mañana se cae el disco... ¿tiene sus respaldos?', 'Y que sus consultas no sean un Full Scan, por favor.'] },
+        intro: ['Nada mal. Ahora, si mañana se cae el disco... ¿tiene sus respaldos? Porque “creo que sí” no es un plan.', 'Y que sus consultas no sean un Full Scan, por favor. Me da cosa.'] },
       { title: 'Acto III · Distribuidas y NoSQL, más un repaso de todo', phases: ['p5', 'p1', 'p2', 'p3', 'p4'],
-        intro: ['Última parte. Datos repartidos por todo el puerto, documentos, vectores...', 'Y de vez en cuando le repito algo que antes le costó. Así se estudia.'] }
+        intro: ['Última parte. Datos repartidos por todo el puerto, documentos, vectores...', 'Y de vez en cuando le repito algo que antes le costó. No es venganza: así se estudia.'] }
     ],
     lines: {
-      right: ['Correcto. Eso viene en la guía, así que ya sabe dónde repasarlo.', 'Muy bien. Así se responde.', 'Exacto. ¿Ve que sí sabía?', 'Bien. Siguiente.', 'Correcto, y con buena justificación.'],
-      wrong: ['Casi. Lea con calma la explicación; esto se repasa.', 'No pasa nada: equivocarse aquí es mejor que en el examen.', 'Esa es una trampa común. Fíjese en la diferencia.', 'Respire. Vuelva a mirar la explicación y seguimos.'],
+      right: ['Correcto. Eso viene en la guía, así que ya sabe dónde repasarlo.', 'Muy bien. Así se responde.', '¡Diay, sí sabía! Siguiente.', 'Bien. Siguiente.', 'Correcto, y con buena justificación.'],
+      wrong: ['Casi. Lea con calma la explicación; esto se repasa.', 'Tranquilo: equivocarse aquí es mejor que en el examen.', 'Esa es la trampa de siempre. Fíjese en la diferencia.', 'Respire, mae. Mire la explicación y seguimos.'],
       win: ['Kai, aprobó la prueba de la Torre.', 'El servidor está encendido, los respaldos están en orden y las consultas vuelan.', 'Ahora vaya a descansar... pero antes, respalde. Siempre respalde.'],
-      lose: ['Se le acabó la energía, pero no el semestre. Doña Chela le guardó un ceviche.', 'Repase sus errores en la Libreta y vuelva a subir.']
+      lose: ['Se le acabó la energía, pero no el semestre. Erika le guardó un ceviche.', 'Repase sus errores en la Libreta y vuelva a subir.']
     }
   },
-  chela: ['Ese señor de la torre es muy buena gente, pero pregunta de TODO. Cómase este, va por la casa.', 'Si se equivoca, no se me achicopale: el ROLLBACK existe para algo.']
+  chela: ['Ese señor de la torre es buenísima gente, pero pregunta de TODO. Cómase este, va por la casa.', 'Si se equivoca, no se me achicopale: para eso existe el ROLLBACK.']
 };
 
 /* ---------------------------------------------------------------------

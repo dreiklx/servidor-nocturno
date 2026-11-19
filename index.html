@@ -2,10 +2,19 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Servidor Nocturno · Nightdare Games</title>
-<link rel="icon" href="assets/img/nyder_logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#120c22">
+<meta name="description" content="Servidor Nocturno: aventura de NYDER Games para estudiar Bases de Datos II.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Servidor Nocturno">
+<title>Servidor Nocturno · NYDER Games</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-180.png">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/v2.css">
 </head>
 <body>
 <div id="stage">
@@ -16,35 +25,42 @@
       <div id="hud-phase"></div>
       <div class="hud-row"><div id="hud-hearts"></div><div id="hud-lemons"></div></div>
     </div>
-    <div class="hud-r"><div class="obj-label">OBJETIVO</div><div id="hud-obj"></div></div>
+    <div class="hud-r"><div class="obj-label">OBJETIVO</div><div id="hud-obj"></div><div id="hud-list"></div></div>
     <div class="hud-btns">
-      <button id="btn-notebook" title="Libreta de estudio (L)">📓</button>
-      <button id="btn-sound" title="Sonido (M)">🔊</button>
-      <button id="btn-menu" title="Pausa (Esc)">☰</button>
+      <button id="btn-notebook" title="Libreta de estudio (L)" aria-label="Libreta de estudio"><i class="ic ic-book"></i></button>
+      <button id="btn-sound" title="Sonido (M)" aria-label="Sonido"><i class="ic ic-sound"></i></button>
+      <button id="btn-menu" title="Pausa (Esc)" aria-label="Pausa"><i class="ic ic-menu"></i></button>
     </div>
   </div>
 
   <div id="title" hidden>
-    <div class="t-studio"><img src="assets/img/nyder_logo.png" alt=""> NIGHTDARE GAMES presenta</div>
+    <div class="t-studio"><img src="assets/img/nyder_logo.png" alt=""> NYDER GAMES presenta</div>
     <h1>SERVIDOR<br><span>NOCTURNO</span></h1>
     <p class="t-sub">Una aventura para estudiar Bases de Datos II · Examen 3</p>
+    <p class="t-copy">© NYDER Games</p>
   </div>
 
-  <div id="splash" hidden>
-    <img src="assets/img/nyder_logo.png" alt="Logo de Nightdare Games">
-    <div class="sp-name">NIGHTDARE <span>GAMES</span></div>
-  </div>
+  <div id="splash" hidden><canvas id="splash-cv" width="1280" height="720" aria-label="NYDER Games"></canvas></div>
 
   <div id="press" hidden>
     <div class="press-box">
       <img src="assets/img/nyder_logo.png" alt="">
-      <p>Presione cualquier tecla o haga clic para empezar</p>
-      <small>Recomendado: pantalla completa (F11) y sonido encendido</small>
+      <p>Toque la pantalla o presione una tecla</p>
+      <small>Con sonido se disfruta más. En teléfono, use el modo horizontal.</small>
+    </div>
+  </div>
+
+  <div id="touch" hidden>
+    <div id="stick"><div id="stick-knob"></div></div>
+    <div id="tbtns">
+      <button id="tb-run" aria-label="Correr">Correr</button>
+      <button id="tb-a" aria-label="Acción">A</button>
     </div>
   </div>
 
   <div id="layer"></div>
   <div id="toast"></div>
+  <div id="rotate" hidden><div>Gire el teléfono a horizontal para jugar más cómodo.</div></div>
   <pre id="autotest" hidden></pre>
 </div>
 
@@ -54,7 +70,16 @@
 <script src="js/sprites.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/scenes.js"></script>
+<script src="js/video.js"></script>
 <script src="js/minigames.js"></script>
+<script src="js/save.js"></script>
+<script src="js/touch.js"></script>
 <script src="js/game.js"></script>
+<script>
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !/[?&](autotest|shot)=/.test(location.search)) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+</script>
 </body>
 </html>

@@ -109,7 +109,7 @@ window.LOGIC = (function () {
   // Prioridad de preguntas: primero las falladas y aún no corregidas, luego las no vistas, luego el resto.
   function pickQuestions(pool, stats, n, avoid = new Set()) {
     const st = id => stats[id] || { r: 0, w: 0 };
-    const pending = pool.filter(q => st(q.id).w > st(q.id).r && !avoid.has(q.id));
+    const pending = pool.filter(q => st(q.id).w > 0 && st(q.id).r <= st(q.id).w && !avoid.has(q.id));
     const unseen = pool.filter(q => st(q.id).r + st(q.id).w === 0 && !avoid.has(q.id));
     const rest = pool.filter(q => !pending.includes(q) && !unseen.includes(q) && !avoid.has(q.id));
     const out = [...shuffle(pending), ...shuffle(unseen), ...shuffle(rest)];
