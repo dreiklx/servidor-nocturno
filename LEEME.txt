@@ -1,0 +1,40 @@
+SERVIDOR NOCTURNO · una aventura de Nightdare Games
+Juego para estudiar IF0010 Bases de Datos II (Examen 3)
+=====================================================
+
+CÓMO ABRIRLO
+1. Haga doble clic en "index.html" (o en "Jugar.bat").
+   Funciona en Chrome o Edge, sin internet y sin instalar nada.
+2. Presione cualquier tecla, elija "Nueva partida" y listo.
+   Recomendado: pantalla completa (F11) y sonido encendido.
+
+CONTROLES
+  WASD / flechas ... moverse        Shift ... correr
+  E / Espacio ...... hablar, leer pizarras, usar pruebas
+  L ................ Libreta de estudio (relee cualquier pizarra)
+  M ................ sonido          Esc ..... pausa
+  En los retos: 1-4 responder · H pista · J limoncito · K ver la pizarra
+
+GUARDADO
+  El progreso se guarda solo en este navegador (localStorage).
+  Doña Chela, la del ceviche en vaso, fija el punto de control antes de cada jefe.
+  Si cambia de navegador o borra los datos del sitio, la partida empieza de cero.
+
+FASES (12 a 18 min cada una)
+  1 Muelle de las Transacciones ..... Guía #8 (ACID, COMMIT/ROLLBACK/SAVEPOINT, log WAL, anomalías, aislamiento)
+  2 Estación de las Planificaciones . Guía #9 (planes, grafo de precedencia, vistas, recuperabilidad, bloqueos, B2F, deadlock, marcas de tiempo, SNAPSHOT)
+  3 Bóveda de la Tormenta ........... Guía #10 + investigaciones (fallas, FULL/DIFF/LOG, BACKUP/RESTORE, seguridad SQL Server, contenedores)
+  4 Mercado Nocturno ................ Guía #11 + investigaciones (optimización, índices, planes, ORMs y N+1, Redis, minería de procesos)
+  5 Archipiélago Distribuido ........ Guías #12 y #13 + investigaciones (BDD, fragmentación, replicación, 2PC, linked servers, MongoDB/MQL, NoSQL, búsqueda semántica)
+  Final: Torre del Servidor ......... Profe Mauricio, 3 actos con preguntas de las 5 fases (prioriza las que falló)
+
+ARCHIVOS
+  index.html, css/, js/       código fuente (HTML5 Canvas + JavaScript, sin librerías)
+  js/content.js               pizarras, preguntas y datos de los minijuegos (todo sale de las guías)
+  assets/                     copias del logo y 5 sonidos del repo five_doors_at_freddys + fuente Pixelify Sans (OFL)
+  tools/validate.js           revisa preguntas, sesgo de longitud, grafos, restauraciones, caché, MQL y mapas  (node tools/validate.js)
+  tools/shots.js              capturas de pantalla con Chrome (desarrollo)
+  Prueba completa automática: abra index.html?autotest=1 en Chrome (el título cambia a "AUTOTEST OK").
+
+El personaje del Profe Mauricio es pixel art dibujado a partir de las fotos de la carpeta;
+las fotos no se copiaron al juego.

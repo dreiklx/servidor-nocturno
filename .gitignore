@@ -1,0 +1,12 @@
+# Nunca subir referencias privadas ni cachés
+ref_private/
+*.jpg
+*.jpeg
+*.heic
+*.mp4
+node_modules/
+dist/
+build/
+graphify-out/cache/
+voice_src/
+*.log
