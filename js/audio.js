@@ -179,5 +179,18 @@ window.AUDIO = (function () {
     if (master) master.gain.value = muted ? 0 : 0.9;
     return muted;
   }
-  return { init, sfx, fx, music, ambient, duck, setStep, toggleMute, isMuted: () => muted };
+  /* Desbloqueo en teléfonos: el navegador deja WebAudio en pausa ("suspended") si no se reanuda
+     dentro de un toque, y iOS lo silencia con el interruptor de silencio. Las narraciones usan
+     <audio> y por eso sí sonaban. Se reanuda en cada gesto y al volver a la app. */
+  function unlock() {
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* sin soporte */ }
+    if (!ctx) init();
+    if (ctx && ctx.state !== 'running') {
+      ctx.resume().catch(() => {});
+      try { const b = ctx.createBuffer(1, 1, 22050), src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start(0); } catch (e) { /* ignorar */ }
+    }
+  }
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(t => window.addEventListener(t, unlock, { capture: true, passive: true }));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume().catch(() => {}); });
+  return { init, sfx, fx, music, ambient, duck, setStep, toggleMute, isMuted: () => muted, state: () => (ctx ? ctx.state : 'sin iniciar') };
 })();
