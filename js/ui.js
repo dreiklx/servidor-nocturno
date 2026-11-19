@@ -20,7 +20,17 @@ window.UI = (function () {
     setTimeout(() => el.remove(), AUTO ? 0 : 160);
   }
   function busy() { return stack.length > 0; }
-  function key(e) { const top = stack[stack.length - 1]; if (top && top.onKey) top.onKey(e); }
+  let typedBuf = '';
+  function key(e) {
+    if (e.key && /^[a-zñ]$/i.test(e.key)) {
+      typedBuf = (typedBuf + e.key.toLowerCase()).slice(-5);
+      if (typedBuf === 'ganar') {
+        typedBuf = '';
+        for (let i = stack.length - 1; i >= 0; i--) if (stack[i].win) { stack[i].win(); return; }
+      }
+    }
+    const top = stack[stack.length - 1]; if (top && top.onKey) top.onKey(e);
+  }
 
   function portraitEl(cv, scale = 4) {
     const wrap = h('div', 'portrait');
@@ -148,7 +158,7 @@ window.UI = (function () {
       const S = cfg.state, th = MOVES[cfg.theme || UI.theme] || MOVES.final;
       const m = h('div', 'modal battle2' + (cfg.boss ? ' boss' : ''));
       m.innerHTML = `
-        <div class="bt-arena"><canvas width="960" height="400"></canvas></div>
+        <div class="bt-arena"><canvas width="960" height="680"></canvas></div>
         <div class="bt-msg"><span></span><i class="bt-more">▼</i></div>
         <div class="bt-panel">
           <div class="bt-concept"></div>
@@ -174,37 +184,38 @@ window.UI = (function () {
 
       function rr(X, Y, w, hh, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + hh, r); x.arcTo(X + w, Y + hh, X, Y + hh, r); x.arcTo(X, Y + hh, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
       function infoBox(X, Y, name, ratio, label) {
-        x.fillStyle = 'rgba(250,246,236,0.96)'; rr(X, Y, 170, 44, 6); x.fill(); x.strokeStyle = '#2a2040'; x.lineWidth = 2; x.stroke();
-        x.fillStyle = '#2a2040'; x.font = '11px "Pixelify Sans", monospace'; x.textAlign = 'left'; x.textBaseline = 'top'; x.fillText(name, X + 8, Y + 5);
-        x.font = '9px "Pixelify Sans", monospace'; x.fillText('PS', X + 8, Y + 25);
-        x.fillStyle = '#3a3050'; rr(X + 26, Y + 24, 134, 9, 3); x.fill();
+        x.fillStyle = 'rgba(250,246,236,0.96)'; rr(X, Y, 200, 56, 7); x.fill(); x.strokeStyle = '#2a2040'; x.lineWidth = 2.5; x.stroke();
+        x.fillStyle = '#2a2040'; x.font = '15px "Pixelify Sans", monospace'; x.textAlign = 'left'; x.textBaseline = 'top'; x.fillText(name, X + 10, Y + 6);
+        x.font = '11px "Pixelify Sans", monospace'; x.fillText('PS', X + 10, Y + 31);
+        x.fillStyle = '#3a3050'; rr(X + 32, Y + 30, 158, 11, 3); x.fill();
         const c = ratio > 0.5 ? '#38c870' : ratio > 0.2 ? '#f0c030' : '#e04040';
-        x.fillStyle = c; rr(X + 28, Y + 26, Math.max(0, 130 * ratio), 5, 2); x.fill();
-        if (label) { x.fillStyle = '#5a5070'; x.textAlign = 'right'; x.fillText(label, X + 162, Y + 35); }
+        x.fillStyle = c; rr(X + 34, Y + 32, Math.max(0, 154 * ratio), 7, 2); x.fill();
+        if (label) { x.fillStyle = '#5a5070'; x.font = '10px "Pixelify Sans", monospace'; x.textAlign = 'right'; x.fillText(label, X + 192, Y + 44); }
       }
       function draw(now) {
         const t = (now - A.t0) / 1000;
         x.save();
         if (A.shake > 0) { x.translate((Math.random() - 0.5) * A.shake, (Math.random() - 0.5) * A.shake); A.shake *= 0.86; if (A.shake < 0.3) A.shake = 0; }
-        const g = x.createLinearGradient(0, 0, 0, 200); g.addColorStop(0, th.bg[0]); g.addColorStop(1, th.bg[1]);
-        x.fillStyle = g; x.fillRect(-10, -10, 500, 220);
-        x.fillStyle = 'rgba(255,255,255,0.35)'; for (let i = 0; i < 20; i++) if ((i + Math.floor(t * 2)) % 6) x.fillRect((i * 83) % 480, (i * 41) % 90, 1, 1);
+        const g = x.createLinearGradient(0, 0, 0, 340); g.addColorStop(0, th.bg[0]); g.addColorStop(1, th.bg[1]);
+        x.fillStyle = g; x.fillRect(-10, -10, 500, 360);
+        x.fillStyle = 'rgba(255,255,255,0.35)'; for (let i = 0; i < 30; i++) if ((i + Math.floor(t * 2)) % 6) x.fillRect((i * 83) % 480, (i * 41) % 150, 1, 1);
+        x.fillStyle = 'rgba(0,0,0,0.22)'; x.fillRect(-10, 230, 500, 120);
         // plataformas
-        x.fillStyle = 'rgba(0,0,0,0.35)'; x.beginPath(); x.ellipse(350, 112, 78, 16, 0, 0, 7); x.fill();
-        x.fillStyle = th.c; x.globalAlpha = 0.25; x.beginPath(); x.ellipse(350, 110, 74, 14, 0, 0, 7); x.fill();
-        x.globalAlpha = 0.35; x.beginPath(); x.ellipse(120, 192, 96, 18, 0, 0, 7); x.fill(); x.globalAlpha = 1;
+        x.fillStyle = 'rgba(0,0,0,0.35)'; x.beginPath(); x.ellipse(340, 182, 100, 20, 0, 0, 7); x.fill();
+        x.fillStyle = th.c; x.globalAlpha = 0.25; x.beginPath(); x.ellipse(340, 180, 96, 18, 0, 0, 7); x.fill();
+        x.globalAlpha = 0.35; x.beginPath(); x.ellipse(130, 318, 120, 22, 0, 0, 7); x.fill(); x.globalAlpha = 1;
         // enemigo
-        const fs = cfg.boss ? 6 : 5, fw = foeCv.width * fs, fh = foeCv.height * fs;
+        const fs = cfg.boss ? 8 : 7, fw = foeCv.width * fs, fh = foeCv.height * fs;
         if (A.foeAlpha > 0) {
           x.globalAlpha = A.foeAlpha * (A.foeFlash > 0 && Math.floor(now / 70) % 2 ? 0.2 : 1);
           const bob = Math.sin(t * 2.4) * 2;
-          x.drawImage(foeCv, 350 - fw / 2 + A.foeX, 108 - fh + bob + A.foeY + A.foeDrop, fw, fh);
+          x.drawImage(foeCv, 340 - fw / 2 + A.foeX, 176 - fh + bob + A.foeY + A.foeDrop, fw, fh);
           x.globalAlpha = 1;
         }
         // Kai de espaldas
-        const ms = 7, mw = meCv.width * ms, mh = meCv.height * ms;
+        const ms = 9, mw = meCv.width * ms, mh = meCv.height * ms;
         x.globalAlpha = A.meAlpha * (A.meFlash > 0 && Math.floor(now / 70) % 2 ? 0.2 : 1);
-        x.drawImage(meCv, 120 - mw / 2 + A.meX, 196 - mh + A.meY + Math.sin(t * 2) * 1, mw, mh);
+        x.drawImage(meCv, 130 - mw / 2 + A.meX, 322 - mh + A.meY + Math.sin(t * 2) * 1, mw, mh);
         x.globalAlpha = 1;
         // proyectil
         if (A.shot) {
@@ -220,10 +231,10 @@ window.UI = (function () {
         x.globalAlpha = 1;
         // cajas de info
         shownHp += (hp - shownHp) * 0.08; shownHearts += (S.hearts - shownHearts) * 0.08;
-        infoBox(12, 12, cfg.name, Math.max(0, shownHp) / cfg.hp, cfg.tag || (cfg.boss ? 'JEFE' : ''));
-        infoBox(296, 150, 'Kai', Math.max(0, shownHearts) / S.maxHearts, `${S.hearts}/${S.maxHearts} · limoncitos ${S.lemons}`);
+        infoBox(14, 16, cfg.name, Math.max(0, shownHp) / cfg.hp, cfg.tag || (cfg.boss ? 'JEFE' : ''));
+        infoBox(266, 262, 'Kai', Math.max(0, shownHearts) / S.maxHearts, `${S.hearts}/${S.maxHearts} · limoncitos ${S.lemons}`);
         x.restore();
-        if (A.flash > 0) { x.fillStyle = A.flashC; x.globalAlpha = A.flash; x.fillRect(0, 0, 480, 200); x.globalAlpha = 1; A.flash = Math.max(0, A.flash - 0.06); }
+        if (A.flash > 0) { x.fillStyle = A.flashC; x.globalAlpha = A.flash; x.fillRect(0, 0, 480, 340); x.globalAlpha = 1; A.flash = Math.max(0, A.flash - 0.06); }
         A.foeFlash = Math.max(0, A.foeFlash - 16); A.meFlash = Math.max(0, A.meFlash - 16);
         raf = requestAnimationFrame(draw);
       }
@@ -239,16 +250,16 @@ window.UI = (function () {
         await msg(`¡Kai usó ${move}!`, 250);
         AUDIO.fx.whoosh ? AUDIO.fx.whoosh() : AUDIO.fx.page();
         await tween(A, 'meY', -10, 120); await tween(A, 'meY', 0, 120);
-        A.shot = { x1: 150, y1: 130, x2: 350, y2: 80, c: th.c, t: performance.now(), d: 420 };
+        A.shot = { x1: 165, y1: 250, x2: 340, y2: 140, c: th.c, t: performance.now(), d: 420 };
         await sleep(420); A.shot = null;
-        AUDIO.fx.hit(); A.flash = 0.7; A.flashC = '#ffffff'; A.shake = 8; A.foeFlash = 600; burstAt(350, 80, th.c, 26);
+        AUDIO.fx.hit(); A.flash = 0.7; A.flashC = '#ffffff'; A.shake = 8; A.foeFlash = 600; burstAt(340, 140, th.c, 26);
         hp--; await tween(A, 'foeX', 10, 60); await tween(A, 'foeX', -8, 60); await tween(A, 'foeX', 0, 60);
         await msg(isRetry ? '¡Segunda oportunidad aprovechada!' : pick(['¡Es muy efectivo!', '¡Golpe crítico de conocimiento!', '¡Le dio de lleno!']), 600);
         say(cfg.lines && cfg.lines.right ? pick(cfg.lines.right) : '');
       }
       async function attackMe(move) {
         await msg(`¡${cfg.name} usó ${move}!`, 250);
-        await tween(A, 'foeX', -40, 160); AUDIO.fx.bad(); A.flash = 0.6; A.flashC = '#ff3040'; A.shake = 12; A.meFlash = 600; burstAt(120, 150, '#ff5d6c', 22);
+        await tween(A, 'foeX', -40, 160); AUDIO.fx.bad(); A.flash = 0.6; A.flashC = '#ff3040'; A.shake = 12; A.meFlash = 600; burstAt(130, 270, '#ff5d6c', 22);
         await tween(A, 'foeX', 0, 200);
         if (!cfg.safe) S.hearts = Math.max(0, S.hearts - 1);
         await msg(cfg.safe ? 'Repaso sin castigo: no pierde energía.' : 'Kai perdió 1 de energía.', 500);
@@ -266,13 +277,12 @@ window.UI = (function () {
         if (!q && retry.length) { q = retry.shift(); isRetry = true; }
         if (!q) { hp = 0; victory(); return; }
         asked.add(q.id); answered = false;
-        const L = cfg.lessonOf(q);
-        $('.bt-concept').innerHTML = (isRetry ? '<b class="again-tag">Otra oportunidad</b> ' : '') + `Tema: <b>${esc(L ? L.title : '')}</b>`;
+        $('.bt-concept').innerHTML = isRetry ? '<b class="again-tag">Otra oportunidad</b>' : '';
         $('.bt-q').textContent = q.q;
         const code = $('.bt-code'); if (q.code) { code.hidden = false; code.textContent = q.code; } else code.hidden = true;
         $('.bt-hint').hidden = true; $('.bt-feedback').hidden = true; $('.t-next').hidden = true;
         ['.t-hint', '.t-lemon', '.t-lesson'].forEach(s => $(s).hidden = false);
-        const box = $('.bt-opts'); box.innerHTML = '';
+        const box = $('.bt-opts'); box.innerHTML = ''; box.classList.toggle('tf2', !!q.tf);
         const order = q.tf ? ['Verdadero', 'Falso'].map(lbl => q.o.indexOf(lbl)) : LOGIC.shuffle(q.o.map((_, i) => i));
         map = order.map(i => ({ i, alive: true }));
         opts = order.map((oi, k) => {
@@ -332,14 +342,14 @@ window.UI = (function () {
         S.lemons--; paintTools(); AUDIO.fx.found();
       });
       $('.t-lesson').addEventListener('click', () => { const L = cfg.lessonOf(q); if (L) lesson(L, { tag: 'Repaso', button: 'Volver al combate' }); });
-      open(m, e => {
-        if (/^[a-zñ]$/i.test(e.key)) { typed = (typed + e.key.toLowerCase()).slice(-5); if (typed === 'ganar' && !finished) { cheated = true; hp = 0; answered = true; busyAnim = false; victory(); return; } }
+      const entry = open(m, e => {
         if (/^[1-4]$/.test(e.key) && !answered) { const k = +e.key - 1; if (opts[k]) answer(k); }
         else if ((e.key === 'Enter' || e.key === ' ') && answered) { e.preventDefault(); cont(); }
         else if ((e.key === 'h' || e.key === 'H') && !answered) $('.t-hint').click();
         else if ((e.key === 'j' || e.key === 'J') && !answered) $('.t-lemon').click();
         else if (e.key === 'k' || e.key === 'K') $('.t-lesson').click();
       });
+      entry.win = () => { if (finished) return; cheated = true; hp = 0; answered = true; busyAnim = false; victory(); };
       raf = requestAnimationFrame(draw);
       (async () => {
         if (!AUTO) { A.foeX = 160; A.meX = -160; tween(A, 'foeX', 0, 500); await tween(A, 'meX', 0, 500); }

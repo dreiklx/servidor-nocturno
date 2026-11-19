@@ -71,6 +71,7 @@
     const b = W.ents.find(e => e.type === 'boss');
     if (b && !W.ents.some(e => e.type === 'portal')) W.ents.push({ type: 'portal', x: b.x, y: b.y, px: b.x * TS + 8, py: b.y * TS + 12, solid: false, t: 0 });
     if (b) b.gone = true;
+    AUDIO.fx.portal();
   }
 
   /* ---------- puertas y progreso ---------- */
@@ -114,19 +115,19 @@
     const mgName = k => CONTENT.mg[d.minigames[k]].title;
     if (!W.gatesOpen.has(1)) {
       const z = zoneLessons(0);
-      return { text: `Vea las pizarras brillantes (${z.filter(l => S.read[l]).length}/${z.length})`, target: lessonEnt(z), head: 'Para abrir el primer paso', list: z.map(l => it('Ver: ' + title(l), S.read[l])) };
+      return { text: `Vea las enseñanzas: video y pizarra (${z.filter(l => S.read[l]).length}/${z.length})`, target: lessonEnt(z), head: 'Para abrir el primer paso', list: z.map(l => it('Ver video y pizarra: ' + title(l), S.read[l])) };
     }
     if (!W.gatesOpen.has(2)) {
       const z = zoneLessons(1), left = enemiesLeft(1), mgd = !!S.mg[d.minigames[0]];
       const t = lessonEnt(z) || (left ? nearestEnemy(1) : null) || (!mgd ? mgEnt(0) : null);
-      const list = z.map(l => it('Ver: ' + title(l), S.read[l])).concat([it(`Vencer ${d.enemy.name} (${3 - left}/3)`, !left), it(`Prueba: ${mgName(0)}`, mgd)]);
+      const list = z.map(l => it('Ver video y pizarra: ' + title(l), S.read[l])).concat([it(`Vencer ${d.enemy.name} (${3 - left}/3)`, !left), it(`Prueba: ${mgName(0)}`, mgd)]);
       const nx = list.find(x => !x.done);
       return { text: nx ? nx.t : 'Siga al marcador', target: t, head: 'Para abrir el segundo paso', list };
     }
     if (!W.gatesOpen.has(3)) {
       const z = zoneLessons(2), left = enemiesLeft(2), mgd = !!S.mg[d.minigames[1]];
       const t = lessonEnt(z) || (left ? nearestEnemy(2) : null) || (!mgd ? mgEnt(1) : null);
-      const list = z.map(l => it('Ver: ' + title(l), S.read[l])).concat([it(`Vencer ${d.enemy.name} (${3 - left}/3)`, !left), it(`Prueba: ${mgName(1)}`, mgd)]);
+      const list = z.map(l => it('Ver video y pizarra: ' + title(l), S.read[l])).concat([it(`Vencer ${d.enemy.name} (${3 - left}/3)`, !left), it(`Prueba: ${mgName(1)}`, mgd)]);
       const nx = list.find(x => !x.done);
       return { text: nx ? nx.t : 'Siga al marcador', target: t, head: 'Para llegar al jefe', list };
     }
@@ -295,6 +296,13 @@
       const st = trainState(tr);
       if (st.warn && !tr.warned && dist(P.x, P.y, P.x, tr.y * TS + 8) < 120) { AUDIO.fx.train(); tr.warned = true; }
       if (!st.warn) tr.warned = false;
+      // un sonido por cada paso, al empezar el cruce; más bajo cuanto más lejos esté Kai
+      if (st.on && !tr.passing) {
+        tr.passing = true;
+        const d = Math.abs(P.y - (tr.y * TS + 8));
+        AUDIO.fx.trainPass(2.2, 1 - Math.min(1, d / 360));
+        window.__trainPasses = (window.__trainPasses || 0) + 1;
+      } else if (!st.on) tr.passing = false;
       if (st.on) {
         const pj = Math.floor((P.y - 3) / TS);
         if (pj === tr.y && P.x > st.tail - 4 && P.x < st.head + 4 && trainHitCd <= 0) {
@@ -311,7 +319,7 @@
 
   async function teleport(tp) {
     mode = 'busy';
-    AUDIO.fx.sparkle();
+    AUDIO.fx.teleport();
     await fadeTo(1, 250);
     P.x = tp.tx * TS + 8; P.y = tp.ty * TS + 12; teleLock = tp.tx + ',' + tp.ty; snapCam();
     UI.toast('Servidor vinculado: <code>Sucursal.Isla.dbo.Muelle</code>', 'gold');
@@ -594,8 +602,8 @@
         if (!S.talked[d.id] && d.id !== 'final') { await UI.dialog([`Primero hable con ${d.npc.name} (el del signo !): le explica qué pasa aquí.`], { name: 'Kai', portrait: SPR.kaiPortrait() }); }
         else {
           const tag = `Enseñanza ${e.idx + 1}/${d.lessons.length}`;
-          const r = window.VIDEO && VIDEO.has(L.id) ? await VIDEO.play(L.id, { title: L.title, tag }) : 'board';
-          if (r === 'board') await UI.lesson(L, { tag: `Pizarra ${e.idx + 1}/${d.lessons.length}` });
+          if (window.VIDEO && VIDEO.has(L.id)) await VIDEO.play(L.id, { title: L.title, tag });
+          await UI.lesson(L, { tag: `Pizarra ${e.idx + 1}/${d.lessons.length} · los detalles`, button: 'Listo' });
           if (first) { S.read[L.id] = true; AUDIO.fx.found(); burst(e.px, e.py - 12, '#7ad7ff', 16); UI.toast('Guardado en la Libreta (L): video y pizarra', 'blue'); updateGates(); }
         }
       } else if (e.type === 'mg') {
@@ -1100,6 +1108,7 @@
     else if (ui === 'notebook') UI.notebook(S, W.def.id);
     else if (ui.startsWith('video:')) { const [, vid, b, st] = ui.split(':'); VIDEO.play(vid, { title: (lessonById[vid] || {}).title, tag: 'Enseñanza', beat: +b || 0, start: st, freeze: params.get('freeze') ? +params.get('freeze') : 0 }); }
     else if (ui === 'faint') faint();
+    else if (ui === 'lessonflow') { S.talked[W.def.id] = true; interact(W.ents.find(e => e.type === 'lesson')); }
     else if (ui === 'splash') splash();
     else if (ui === 'hud') updateHud(true);
   }

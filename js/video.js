@@ -8,6 +8,9 @@ window.VIDEO = (function () {
   const FONT = '"Pixelify Sans", monospace', MONO = 'Consolas, "Courier New", monospace';
   const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   let voiceStatus = null; // null = sin probar, true = hay voz, false = falta algún audio
+  const RATES = [0.8, 0.9, 1, 1.1, 1.25, 1.4];
+  let rate = 1;
+  try { const r = parseFloat(localStorage.getItem('nd_video_rate')); if (RATES.includes(r)) rate = r; } catch (e) { /* sin almacenamiento */ }
 
   /* ---------------- Iconos en pixel art (dibujados con rectángulos) ---------------- */
   const ICON_ROWS = {
@@ -232,6 +235,7 @@ window.VIDEO = (function () {
       const m = UI.h('div', 'modal video');
       m.innerHTML = `
         <div class="v-head"><span class="v-tag">${UI.esc(opt.tag || 'Enseñanza')}</span><b>${UI.esc(opt.title || '')}</b><button class="v-x" aria-label="Cerrar video">✕</button></div>
+        <div class="v-note">El video explica el tema; al terminar se abre la <b>pizarra</b> con los detalles. Puede abrirla cuando quiera con el botón “Pizarra”.</div>
         <div class="v-stage"><canvas width="${W * Q}" height="${H * Q}"></canvas>
           <div class="v-sub"><span class="v-who"></span><span class="v-line"></span></div>
           <div class="v-quiz" hidden></div>
@@ -242,6 +246,8 @@ window.VIDEO = (function () {
           <button class="v-play" aria-label="Pausa">⏸</button>
           <button class="v-next" aria-label="Siguiente">⏭</button>
           <div class="v-dots"></div>
+          <label class="v-rate">Velocidad <select aria-label="Velocidad de la narración">${RATES.map(r => `<option value="${r}"${r === rate ? ' selected' : ''}>${String(r).replace('.', ',')}×</option>`).join('')}</select></label>
+          <button class="v-board2" title="Abrir la pizarra con los detalles">Pizarra</button>
           <span class="v-voice"></span>
         </div>`;
       const $ = s => m.querySelector(s);
@@ -256,9 +262,10 @@ window.VIDEO = (function () {
       function startAudio(file, text) {
         stopAudio(); audioDone = false;
         const est = Math.max(3000, text.split(/\s+/).length / 2.6 * 1000);
-        beatEnd = est; // se corrige con la duración real
+        beatEnd = est / rate; // se corrige con la duración real
         const a = new Audio('assets/voice/' + file + '.mp3'); audio = a;
-        a.onloadedmetadata = () => { if (isFinite(a.duration)) beatEnd = a.duration * 1000 + 350; };
+        a.preservesPitch = true; a.playbackRate = rate;
+        a.onloadedmetadata = () => { if (isFinite(a.duration)) beatEnd = a.duration * 1000 / rate + 350; a.playbackRate = rate; };
         a.onended = () => { audioDone = true; };
         a.onerror = () => { if (audio === a) { missingVoice = true; voiceStatus = false; audio = null; audioDone = false; setVoiceLabel(); } };
         if (window.AUDIO && AUDIO.duck) AUDIO.duck(true);
@@ -306,10 +313,9 @@ window.VIDEO = (function () {
         sub('Radio Nocturna', 'Lo importante: ' + sc.recap.join(' · '));
         startAudio(`${sc.id}_r`, sc.recap.join(' '));
         const end = UI.h('div', 'v-end');
-        end.innerHTML = `<button class="btn ghost v-again">↺ Ver otra vez</button><button class="btn ghost v-board">Ver la pizarra</button><button class="btn primary v-ok">Listo <kbd>Enter</kbd></button>`;
+        end.innerHTML = `<button class="btn ghost v-again">↺ Ver otra vez</button><button class="btn primary v-ok">Seguir a la pizarra <kbd>Enter</kbd></button>`;
         $('.v-ctrl').appendChild(end);
         end.querySelector('.v-again').addEventListener('click', () => { end.remove(); goBeat(0); });
-        end.querySelector('.v-board').addEventListener('click', () => finish('board'));
         end.querySelector('.v-ok').addEventListener('click', () => finish('done'));
         end.querySelector('.v-ok').focus({ preventScroll: true });
       }
@@ -325,7 +331,7 @@ window.VIDEO = (function () {
       function frame(now) {
         const dt = Math.min(50, now - last); last = now;
         if (playing && phase === 'beats') {
-          clock += dt;
+          clock += dt * rate;
           const b = sc.beats[beat];
           while (cmdIdx < b.cmds.length && clock >= waitUntil) {
             const c = b.cmds[cmdIdx++];
@@ -342,12 +348,19 @@ window.VIDEO = (function () {
         raf = requestAnimationFrame(frame);
       }
       $('.v-x').addEventListener('click', () => finish('skip'));
+      $('.v-board2').addEventListener('click', () => finish('board'));
+      $('.v-rate select').addEventListener('change', e => {
+        rate = parseFloat(e.target.value) || 1;
+        try { localStorage.setItem('nd_video_rate', String(rate)); } catch (err) { /* sin almacenamiento */ }
+        if (audio) { audio.playbackRate = rate; if (isFinite(audio.duration)) beatEnd = audio.duration * 1000 / rate + 350; }
+        e.target.blur();
+      });
       $('.v-play').addEventListener('click', togglePlay);
       $('.v-stage canvas').addEventListener('click', () => { if (phase === 'beats') togglePlay(); });
       $('.v-big').addEventListener('click', togglePlay);
       $('.v-prev').addEventListener('click', () => { if (phase === 'beats') goBeat(Math.max(0, beat - 1)); else { m.querySelector('.v-end') && m.querySelector('.v-end').remove(); goBeat(total - 1); } });
       $('.v-next').addEventListener('click', () => { if (phase === 'beats') { if (beat + 1 < total) goBeat(beat + 1); else showQuiz(); } });
-      UI.open(m, e => {
+      const entry = UI.open(m, e => {
         if (e.key === ' ' && phase === 'beats') { e.preventDefault(); togglePlay(); }
         else if (e.key === 'ArrowRight') $('.v-next').click();
         else if (e.key === 'ArrowLeft') $('.v-prev').click();
@@ -355,6 +368,12 @@ window.VIDEO = (function () {
         else if (phase === 'quiz' && /^[1-3]$/.test(e.key)) { const b = m.querySelectorAll('.vq-o button')[+e.key - 1]; if (b && !b.disabled) b.click(); }
         else if (e.key === 'Enter') { const go = m.querySelector('.vq-go') || m.querySelector('.v-ok'); if (go) { e.preventDefault(); go.click(); } }
       });
+      // truco de prueba: resuelve la pausa del video y deja seguir al resumen
+      entry.win = () => {
+        if (phase === 'beats') showQuiz();
+        if (phase === 'quiz') { const b = m.querySelector('.vq-o button[data-i="0"]'); if (b && !b.disabled) b.click(); }
+        else if (phase === 'recap') finish('done');
+      };
       setVoiceLabel();
       if (opt.start === 'quiz') { beat = total - 1; showQuiz(); } else if (opt.start === 'recap') showRecap(); else goBeat(opt.beat || 0);
       if (opt.freeze) { playing = false; }

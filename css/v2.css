@@ -57,31 +57,35 @@
 .nb-vid { background: #6d6ff022; border: 2px solid var(--accent2); border-radius: 8px; font-family: var(--pix); padding: 0 .7em; }
 
 /* ---------- Combate ---------- */
-.modal.battle2 { left: 3%; right: 3%; top: 3%; bottom: 3%; display: grid; grid-template-columns: 1.05fr 1fr; grid-template-rows: 1fr auto; gap: .5em; background: #0a0816f0; border: 3px solid var(--line); border-radius: 12px; padding: .6em; }
+.modal.battle2 { left: 2.5%; right: 2.5%; top: 3%; bottom: 3%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; gap: .6em .8em; background: #0a0816f0; border: 3px solid var(--line); border-radius: 12px; padding: .7em; }
 .modal.battle2.boss { border-color: #ff6b7a; box-shadow: 0 0 30px #ff6b7a44; }
-.modal.battle2 { grid-template-rows: auto 1fr; }
-.bt-arena { grid-column: 1; grid-row: 1; min-height: 0; display: flex; align-items: flex-start; }
-.bt-arena canvas { width: 100%; aspect-ratio: 480 / 200; border-radius: 8px; image-rendering: pixelated; }
-.bt-msg { grid-column: 1; grid-row: 2; align-self: start; background: #faf6ec; color: #241a3a; border: 3px solid #2a2040; border-radius: 10px; padding: .5em .8em; min-height: 3.2em; font-family: var(--pix); position: relative; cursor: pointer; }
+.bt-arena { grid-column: 1; grid-row: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.bt-arena canvas { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; image-rendering: pixelated; }
+.bt-msg { grid-column: 1; grid-row: 2; background: #faf6ec; color: #241a3a; border: 3px solid #2a2040; border-radius: 10px; padding: .55em .9em; min-height: 3.4em; font-family: var(--pix); font-size: 1.05em; position: relative; cursor: pointer; }
 .bt-more { position: absolute; right: .6em; bottom: .2em; font-style: normal; font-size: .7em; animation: blink 1s steps(2) infinite; }
-.bt-panel { grid-column: 2; grid-row: 1 / span 2; display: flex; flex-direction: column; gap: .45em; min-height: 0; overflow: auto; transition: opacity .2s; }
+.bt-panel { grid-column: 2; grid-row: 1 / span 2; display: flex; flex-direction: column; gap: .55em; min-height: 0; overflow: auto; transition: opacity .2s; padding-right: .2em; }
 .bt-panel.dim { opacity: .35; }
-.bt-concept { font-size: .75em; color: var(--muted); }
-.again-tag { color: #241a3a; background: var(--gold); border-radius: 4px; padding: 0 .35em; margin-right: .3em; }
-.bt-q { font-size: 1em; line-height: 1.35; }
-.bt-opts { display: grid; grid-template-columns: 1fr 1fr; gap: .4em; }
+.bt-concept:empty { display: none; }
+.bt-concept { font-size: .8em; }
+.again-tag { color: #241a3a; background: var(--gold); border-radius: 4px; padding: 0 .4em; }
+.bt-q { font-size: 1.18em; line-height: 1.38; background: #ffffff08; border: 2px solid #ffffff14; border-radius: 10px; padding: .55em .75em; }
+.bt-opts { display: grid; grid-template-columns: 1fr; gap: .45em; flex: 1 1 auto; grid-auto-rows: minmax(2.4em, 1fr); max-height: 70%; }
+.bt-opts .opt { align-items: center; }
+.bt-opts .opt { font-size: 1.02em; padding: .6em .8em; }
 .bt-opts .opt.move { border-left: 6px solid var(--accent2); }
+.bt-opts.tf2 { grid-template-columns: 1fr 1fr; }
 .bt-opts.pop .opt { animation: pop .3s ease both; }
 .bt-opts.pop .opt:nth-child(2) { animation-delay: .04s; }
 .bt-opts.pop .opt:nth-child(3) { animation-delay: .08s; }
 .bt-opts.pop .opt:nth-child(4) { animation-delay: .12s; }
 .battle2:not(.asking) .bt-opts .opt:not(.right):not(.wrong) { opacity: .55; }
-.bt-hint { background: #ffd34d1a; border-left: 3px solid var(--gold); padding: .3em .6em; font-size: .9em; }
-.bt-feedback { border-radius: 8px; padding: .45em .7em; line-height: 1.4; font-size: .92em; }
+.bt-hint { background: #ffd34d1a; border-left: 3px solid var(--gold); padding: .35em .65em; font-size: .95em; }
+.bt-feedback { border-radius: 8px; padding: .5em .75em; line-height: 1.42; font-size: .98em; }
 .bt-feedback.ok { background: #4fd18b1f; border: 2px solid #4fd18b77; }
 .bt-feedback.ko { background: #ff6b7a1a; border: 2px solid #ff6b7a77; }
 .bt-feedback .again { display: block; margin-top: .25em; color: var(--gold); font-size: .9em; }
-.bt-tools { display: flex; gap: .35em; flex-wrap: wrap; margin-top: auto; }
+.bt-tools { display: flex; gap: .4em; flex-wrap: wrap; margin-top: auto; }
+.bt-tools .btn { font-size: .95em; }
 .bt-code { margin: 0; }
 
 /* ---------- Táctil ---------- */
@@ -102,11 +106,19 @@ body.touch .hud-btns button { padding: .4em .6em; }
   #stage { font-size: calc(var(--u) * 1.75); }
   .hud-r { max-width: 40%; }
   #hud-list { font-size: .62em; }
-  .modal.battle2 { grid-template-columns: 1fr 1.15fr; padding: .4em; }
-  .bt-q { font-size: .9em; }
+  .modal.battle2 { padding: .45em; gap: .4em .5em; }
+  .bt-q { font-size: .95em; padding: .4em .55em; }
+  .bt-opts .opt { font-size: .88em; padding: .4em .55em; }
+  .bt-msg { font-size: .9em; min-height: 2.8em; }
   .opt, .vq-o button { font-size: .85em; padding: .35em .5em; }
   .card { left: 3%; right: 3%; top: 3%; bottom: 3%; }
   .menu { left: 18%; right: 18%; }
   .modal.title-menu { width: 60%; }
   .v-sub { font-size: .85em; }
 }
+
+/* v3: aviso de pizarra, velocidad y botón de pizarra en el video */
+.v-note { font-size: .78em; color: #fff; background: #ffd34d22; border: 1px solid #ffd34d66; border-radius: 8px; padding: .25em .7em; }
+.v-rate { font-size: .72em; color: var(--muted); display: flex; align-items: center; gap: .35em; }
+.v-rate select { font: inherit; color: #fff; background: #1b1e33; border: 2px solid var(--line); border-radius: 6px; padding: .05em .3em; }
+.v-ctrl > .v-board2 { background: #ffd34d22; border-color: #ffd34d99; color: #ffe9a8; }

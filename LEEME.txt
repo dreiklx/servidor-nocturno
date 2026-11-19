@@ -21,6 +21,8 @@ CÓMO SE JUEGA
   Cada fase: hablar con el guía → ver las enseñanzas (video narrado + pizarra) → vencer enemigos
   y superar dos pruebas → pasar por el puesto de Erika Ceviches (guarda) → jefe.
   Arriba a la derecha siempre aparece qué falta para avanzar.
+  Cada enseñanza: primero el video (botón "Velocidad" para ir de 0,8x a 1,4x) y después la pizarra con los detalles.
+  La pizarra también se abre en cualquier momento con el botón "Pizarra" del video, y queda en la Libreta (L).
   Responder bien = Kai ataca. Si falla, verá por qué, y esa pregunta vuelve en el mismo combate.
   El Profe Mauricio, al final, repasa las 5 fases y empieza por lo que usted falló.
 

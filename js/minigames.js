@@ -18,10 +18,12 @@ window.MINI = (function () {
   function run(S, onKey) {
     return new Promise(resolve => {
       S.resolve = v => { UI.close(S.m); resolve(v); };
-      UI.open(S.m, e => { if (e.key === 'Escape') { e.preventDefault(); S.resolve(false); } else if (onKey) onKey(e); });
+      const entry = UI.open(S.m, e => { if (e.key === 'Escape') { e.preventDefault(); S.resolve(false); } else if (onKey) onKey(e); });
+      entry.win = () => { if (!S.won) done(S, ''); };
     });
   }
   function done(S, html) {
+    S.won = true;
     AUDIO.fx.win();
     S.body.innerHTML = `<div class="mg-done">¡Prueba superada!</div>${html ? `<div class="mg-sum">${html}</div>` : ''}`;
     S.clearFb(); S.actions.innerHTML = '';

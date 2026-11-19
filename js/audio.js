@@ -10,7 +10,7 @@ window.AUDIO = (function () {
     sparkle: 'assets/sfx/nyder_star_sparkle.wav'
   };
   const pool = {};
-  const MUSIC_VOL = 0.15;
+  const MUSIC_VOL = 0.15, AMB_VOL = 0.32;
   try { if (localStorage.getItem('nd_muted') === '1') muted = true; } catch (e) { /* sin almacenamiento */ }
 
   function init() {
@@ -20,7 +20,7 @@ window.AUDIO = (function () {
       master = ctx.createGain(); master.gain.value = muted ? 0 : 0.9; master.connect(ctx.destination);
       musicGain = ctx.createGain(); musicGain.gain.value = MUSIC_VOL; musicGain.connect(master);
       sfxGain = ctx.createGain(); sfxGain.gain.value = 1; sfxGain.connect(master);
-      ambGain = ctx.createGain(); ambGain.gain.value = 0.5; ambGain.connect(master);
+      ambGain = ctx.createGain(); ambGain.gain.value = AMB_VOL; ambGain.connect(master);
       const len = ctx.sampleRate * 2; noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
       const d = noiseBuf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     } catch (e) { ctx = null; }
@@ -49,7 +49,7 @@ window.AUDIO = (function () {
     s.buffer = noiseBuf; s.loop = true; f.type = type; f.frequency.setValueAtTime(freq, t); f.Q.value = opt.q || 1;
     if (opt.to) f.frequency.exponentialRampToValueAtTime(opt.to, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + (opt.attack || 0.005)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    s.connect(f); f.connect(g); g.connect(sfxGain); s.start(t, Math.random()); s.stop(t + dur + 0.05);
+    s.connect(f); f.connect(g); g.connect(opt.bus || sfxGain); s.start(t, Math.random()); s.stop(t + dur + 0.05);
   }
 
   let stepTheme = 'muelle', stepAlt = 0;
@@ -68,7 +68,7 @@ window.AUDIO = (function () {
     good() { tone(660, 0.09, 'square', 0.08); tone(990, 0.18, 'square', 0.08, 0, 0.08); },
     bad() { sfx('error', 0.45); tone(170, 0.25, 'sawtooth', 0.05, -70); },
     whoosh() { noise(0.28, 'bandpass', 400, 0.16, { to: 3200, q: 2, attack: 0.05 }); },
-    hit() { noise(0.14, 'lowpass', 1800, 0.35, { to: 200 }); tone(140, 0.16, 'square', 0.12, -90); },
+    hit() { noise(0.14, 'lowpass', 1800, 0.28, { to: 200 }); tone(140, 0.16, 'square', 0.1, -90); },
     win() { [523, 659, 784, 1046, 784, 1046].forEach((f, i) => tone(f, i === 5 ? 0.45 : 0.14, 'square', 0.07, 0, i * 0.11)); tone(262, 0.7, 'triangle', 0.08, 0, 0.55); },
     lose() { [494, 440, 392, 330].forEach((f, i) => tone(f, 0.3, 'triangle', 0.08, -20, i * 0.22)); },
     open() { noise(0.35, 'lowpass', 300, 0.25, { to: 90 }); tone(196, 0.12, 'square', 0.06, 0, 0.1); tone(294, 0.2, 'square', 0.06, 0, 0.22); },
@@ -82,10 +82,18 @@ window.AUDIO = (function () {
       const len = ctx.sampleRate * 1.4, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
       for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
       const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
-      f.type = 'lowpass'; f.frequency.value = 400; g.gain.value = 0.35;
-      s.buffer = buf; s.connect(f); f.connect(g); g.connect(sfxGain); s.start();
+      f.type = 'lowpass'; f.frequency.value = 400; g.gain.value = 0.5;
+      s.buffer = buf; s.connect(f); f.connect(g); g.connect(ambGain); s.start();
     },
-    train() { tone(330, 0.2, 'square', 0.05); tone(330, 0.2, 'square', 0.05, 0, 0.26); noise(0.6, 'lowpass', 200, 0.12, { delay: 0.1 }); },
+    train() { tone(330, 0.18, 'square', 0.03); tone(330, 0.18, 'square', 0.03, 0, 0.26); },
+    // paso de un tren: rumor grave + traqueteo de rieles durante el cruce (k = cercanía 0..1)
+    trainPass(dur = 2.2, k = 1) {
+      if (!ctx || muted) return;
+      const v = 0.2 + 0.8 * Math.max(0, Math.min(1, k));
+      noise(dur, 'lowpass', 140, 0.5 * v, { attack: 0.35, bus: ambGain });
+      for (let t = 0.1; t < dur - 0.15; t += 0.19) noise(0.05, 'bandpass', 1500 + (Math.round(t / 0.19) % 2) * 400, 0.16 * v, { q: 6, delay: t, bus: ambGain });
+      tone(523, 0.35, 'triangle', 0.02 * v, 0, 0.05); tone(659, 0.35, 'triangle', 0.02 * v, 0, 0.05);
+    },
     teleport() { tone(300, 0.4, 'sine', 0.08, 900); noise(0.4, 'highpass', 2000, 0.04, { to: 8000 }); },
     portal() { [392, 523, 659, 784].forEach((f, i) => tone(f, 0.3, 'sine', 0.06, 0, i * 0.07)); }
   };
@@ -95,11 +103,11 @@ window.AUDIO = (function () {
     ambName = name;
     if (!ctx) return;
     if (amb) { try { amb.forEach(n => n.stop && n.stop()); } catch (e) { /* ya detenido */ } amb = null; }
-    const cfg = { muelle: ['lowpass', 500, 0.22, 0.12], islas: ['lowpass', 700, 0.2, 0.09], boveda: ['highpass', 2500, 0.07, 0.6], mercado: ['bandpass', 900, 0.06, 0.4], estacion: ['lowpass', 160, 0.14, 0.05], torre: ['lowpass', 260, 0.06, 0.05] }[name];
+    const cfg = { muelle: ['lowpass', 420, 0.12, 0.12], islas: ['lowpass', 520, 0.1, 0.09], boveda: ['highpass', 2500, 0.05, 0.6], mercado: ['bandpass', 900, 0.045, 0.4], estacion: ['lowpass', 160, 0.07, 0.05], torre: ['lowpass', 260, 0.05, 0.05] }[name];
     if (!cfg || !noiseBuf) return;
     const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
     s.buffer = noiseBuf; s.loop = true; f.type = cfg[0]; f.frequency.value = cfg[1]; g.gain.value = cfg[2];
-    lfo.frequency.value = cfg[3]; lg.gain.value = cfg[2] * 0.7; lfo.connect(lg); lg.connect(g.gain);
+    lfo.frequency.value = cfg[3]; lg.gain.value = cfg[2] * 0.45; lfo.connect(lg); lg.connect(g.gain);
     s.connect(f); f.connect(g); g.connect(ambGain); s.start(); lfo.start();
     amb = [s, lfo];
   }
@@ -163,7 +171,7 @@ window.AUDIO = (function () {
     o.connect(g); g.connect(musicGain); o.start(t); o.stop(t + dur + 0.05);
   }
   // baja la música mientras habla la narración
-  function duck(on) { if (musicGain && ctx) musicGain.gain.setTargetAtTime(on ? MUSIC_VOL * 0.25 : MUSIC_VOL, ctx.currentTime, 0.2); if (ambGain && ctx) ambGain.gain.setTargetAtTime(on ? 0.15 : 0.5, ctx.currentTime, 0.2); }
+  function duck(on) { if (musicGain && ctx) musicGain.gain.setTargetAtTime(on ? MUSIC_VOL * 0.25 : MUSIC_VOL, ctx.currentTime, 0.2); if (ambGain && ctx) ambGain.gain.setTargetAtTime(on ? AMB_VOL * 0.25 : AMB_VOL, ctx.currentTime, 0.2); }
   function setStep(theme) { stepTheme = theme; }
   function toggleMute() {
     muted = !muted;
