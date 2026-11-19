@@ -93,7 +93,7 @@ body.modal-open #touch { display: none; }
 #tbtns button { width: 15vmin; height: 15vmin; border-radius: 50%; background: #6d6ff066; border: 2px solid #fff8; font-family: var(--pix); font-size: 4.2vmin; touch-action: none; }
 #tbtns #tb-run { width: 11vmin; height: 11vmin; font-size: 2.4vmin; background: #ffffff22; }
 #tbtns #tb-run.on { background: #ffd34d88; }
-body.touch .hud-btns { bottom: auto; top: calc(var(--u) * 7); }
+body.touch .hud-btns { top: auto; bottom: 3%; right: 50%; transform: translateX(50%); }
 body.touch .hud-btns button { padding: .4em .6em; }
 #rotate { position: fixed; inset: 0; z-index: 99; background: #000e; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2em; font-family: var(--pix); font-size: 18px; }
 
