@@ -307,7 +307,7 @@ window.VIDEO = (function () {
         startAudio(`${sc.id}_r`, sc.recap.join(' '));
         const end = UI.h('div', 'v-end');
         end.innerHTML = `<button class="btn ghost v-again">↺ Ver otra vez</button><button class="btn ghost v-board">Ver la pizarra</button><button class="btn primary v-ok">Listo <kbd>Enter</kbd></button>`;
-        $('.v-quiz').after(end);
+        $('.v-ctrl').appendChild(end);
         end.querySelector('.v-again').addEventListener('click', () => { end.remove(); goBeat(0); });
         end.querySelector('.v-board').addEventListener('click', () => finish('board'));
         end.querySelector('.v-ok').addEventListener('click', () => finish('done'));

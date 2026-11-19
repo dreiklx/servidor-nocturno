@@ -1,0 +1,7 @@
+assets/
+dist/
+voice_src/
+sw.js
+*.txt
+index.html
+graphify-out/

@@ -1,40 +1,52 @@
-SERVIDOR NOCTURNO · una aventura de Nightdare Games
-Juego para estudiar IF0010 Bases de Datos II (Examen 3)
-=====================================================
+SERVIDOR NOCTURNO · un juego de NYDER Games
+Para estudiar IF0010 Bases de Datos II (Examen 3)
+=================================================
 
-CÓMO ABRIRLO
-1. Haga doble clic en "index.html" (o en "Jugar.bat").
-   Funciona en Chrome o Edge, sin internet y sin instalar nada.
-2. Presione cualquier tecla, elija "Nueva partida" y listo.
-   Recomendado: pantalla completa (F11) y sonido encendido.
+CÓMO ABRIRLO (elija una)
+1. Windows, sin instalar nada: doble clic en ServidorNocturno.exe.
+   Abre el juego en una ventana de Microsoft Edge (Windows 10 y 11 lo traen).
+   El avance se guarda solo en esta computadora.
+2. Teléfono o computadora como app (PWA): abra el enlace del juego en Chrome, Edge o Safari
+   y elija "Instalar app" o "Agregar a pantalla de inicio". Después de la primera carga funciona sin internet.
+3. Desde los archivos: doble clic en index.html. Funciona, pero sin modo offline ni instalación.
 
 CONTROLES
-  WASD / flechas ... moverse        Shift ... correr
-  E / Espacio ...... hablar, leer pizarras, usar pruebas
-  L ................ Libreta de estudio (relee cualquier pizarra)
-  M ................ sonido          Esc ..... pausa
-  En los retos: 1-4 responder · H pista · J limoncito · K ver la pizarra
+  Computadora: WASD o flechas para moverse · Shift para correr · E o Espacio para hablar y usar
+               L abre la Libreta · M silencia · Esc pausa
+               En combate: 1-4 responder · H pista · J limoncito · K ver la pizarra
+  Teléfono:    joystick a la izquierda · botón A para hablar y continuar · Correr
+               En combates, videos y menús, toque las opciones directamente. Juegue en horizontal.
 
-GUARDADO
-  El progreso se guarda solo en este navegador (localStorage).
-  Doña Chela, la del ceviche en vaso, fija el punto de control antes de cada jefe.
-  Si cambia de navegador o borra los datos del sitio, la partida empieza de cero.
+CÓMO SE JUEGA
+  Cada fase: hablar con el guía → ver las enseñanzas (video narrado + pizarra) → vencer enemigos
+  y superar dos pruebas → pasar por el puesto de Erika Ceviches (guarda) → jefe.
+  Arriba a la derecha siempre aparece qué falta para avanzar.
+  Responder bien = Kai ataca. Si falla, verá por qué, y esa pregunta vuelve en el mismo combate.
+  El Profe Mauricio, al final, repasa las 5 fases y empieza por lo que usted falló.
 
-FASES (12 a 18 min cada una)
-  1 Muelle de las Transacciones ..... Guía #8 (ACID, COMMIT/ROLLBACK/SAVEPOINT, log WAL, anomalías, aislamiento)
-  2 Estación de las Planificaciones . Guía #9 (planes, grafo de precedencia, vistas, recuperabilidad, bloqueos, B2F, deadlock, marcas de tiempo, SNAPSHOT)
-  3 Bóveda de la Tormenta ........... Guía #10 + investigaciones (fallas, FULL/DIFF/LOG, BACKUP/RESTORE, seguridad SQL Server, contenedores)
-  4 Mercado Nocturno ................ Guía #11 + investigaciones (optimización, índices, planes, ORMs y N+1, Redis, minería de procesos)
-  5 Archipiélago Distribuido ........ Guías #12 y #13 + investigaciones (BDD, fragmentación, replicación, 2PC, linked servers, MongoDB/MQL, NoSQL, búsqueda semántica)
-  Final: Torre del Servidor ......... Profe Mauricio, 3 actos con preguntas de las 5 fases (prioriza las que falló)
+GUARDADO Y COPIA DE SEGURIDAD
+  Se guarda en el dispositivo (sin cuentas ni nube).
+  Título → "Copia de seguridad" para exportar o importar un archivo .json.
+  También en Pausa → "Guardar y exportar copia".
+  Cada forma de abrirlo (el .exe, la app instalada, otro navegador) tiene su propio guardado:
+  use la copia .json para pasar el avance de una a otra.
 
-ARCHIVOS
-  index.html, css/, js/       código fuente (HTML5 Canvas + JavaScript, sin librerías)
-  js/content.js               pizarras, preguntas y datos de los minijuegos (todo sale de las guías)
-  assets/                     copias del logo y 5 sonidos del repo five_doors_at_freddys + fuente Pixelify Sans (OFL)
-  tools/validate.js           revisa preguntas, sesgo de longitud, grafos, restauraciones, caché, MQL y mapas  (node tools/validate.js)
-  tools/shots.js              capturas de pantalla con Chrome (desarrollo)
-  Prueba completa automática: abra index.html?autotest=1 en Chrome (el título cambia a "AUTOTEST OK").
+FASES
+  1 Muelle de las Transacciones ..... Guía #8
+  2 Estación de las Planificaciones . Guía #9
+  3 Bóveda de la Tormenta ........... Guía #10 + investigaciones (seguridad, contenedores)
+  4 Mercado Nocturno ................ Guía #11 + investigaciones (ORMs, Redis, minería de procesos)
+  5 Archipiélago Distribuido ........ Guías #12 y #13 + investigaciones (NoSQL, búsqueda semántica)
+  Final: Torre del Servidor ......... Profe Mauricio, 3 actos
 
-El personaje del Profe Mauricio es pixel art dibujado a partir de las fotos de la carpeta;
-las fotos no se copiaron al juego.
+PARA DESARROLLAR
+  docs/ARQUITECTURA.md explica el código (indexado con Graphify: graphify-out/graph.html).
+  node tools/validate.js              revisa las preguntas, el sesgo de longitud y la lógica de los minijuegos
+  node tools/serve.js                 sirve el juego en http://localhost:8642/
+  node tools/run_autotest.js          juega todo automáticamente (requiere el servidor)
+  node tools/build_sw.js              regenera la lista offline (después de cambiar archivos)
+  node tools/exe/build_exe.js         compila dist/ServidorNocturno.exe
+  Voz: tools/voice_lines.js → tools/synth_qwen.py (Qwen3-TTS, entorno de Story Lab) → tools/encode_voice.sh
+
+Créditos: NYDER Games. Fuente Pixelify Sans (licencia OFL, assets/fonts/OFL.txt).
+El Profe Mauricio y Erika Ceviches son versiones ilustradas, hechas con cariño; no se incluyen fotos.

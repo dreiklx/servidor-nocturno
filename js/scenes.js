@@ -40,7 +40,7 @@ window.SCENES = (function () {
       [['clr'], ['spr', 'e', 'erika', 300, 130, 4], ['spr', 'cup', 'cup', 380, 160, 3], ['spr', 'kai', 'kai', 150, 140, 4], ['w', 900], ['bub', 'e', '¡Aquí le guardo, mi amor!']]),
     B('Con errores se usa TRY y CATCH: el trabajo va en BEGIN TRY. Si algo falla, el CATCH hace ROLLBACK, pero solo si arroba arroba TRANCOUNT es mayor que cero, o sea, si hay una transacción abierta.',
       [['clr'], ['code', 'c', 60, 30, ['BEGIN TRY', '  BEGIN TRANSACTION', '    UPDATE ...', '  COMMIT', 'END TRY', 'BEGIN CATCH', '  IF @@TRANCOUNT > 0', '    ROLLBACK', 'END CATCH']], ['w', 3500], ['hl', 'c']])
-  ], { q: 'Hizo SAVE TRANSACTION p1 y después ROLLBACK TRANSACTION p1. ¿Qué se deshace?', o: ['Lo hecho después de p1', 'Todo desde el BEGIN', 'Nada, falta el COMMIT'], why: 'Revertir a un savepoint deshace solo hasta ese punto. Lo anterior queda pendiente de confirmar.' },
+  ], { q: 'Hizo SAVE TRANSACTION p1 y después ROLLBACK TRANSACTION p1. ¿Qué se deshace?', o: ['Lo hecho después de p1', 'Todo lo hecho desde el BEGIN', 'Nada, porque falta el COMMIT'], why: 'Revertir a un savepoint deshace solo hasta ese punto. Lo anterior queda pendiente de confirmar.' },
   ['COMMIT guarda; ROLLBACK deshace todo.', 'SAVE TRANSACTION marca un punto; ROLLBACK a ese nombre vuelve solo hasta ahí.', 'En el CATCH: si @@TRANCOUNT > 0, ROLLBACK.']);
 
   add('p1l3', 'muelle', [
@@ -87,7 +87,7 @@ window.SCENES = (function () {
       [['clr'], ['txt', 'h', 240, 40, 'NO SERIE (intercalado)', 'o', 14], ['box', 'a1', 20, 70, 100, 30, 'T1 · l1(X)', 'b'], ['box', 'b1', 130, 70, 100, 30, 'T2 · l2(Y)', 'o'], ['box', 'a2', 240, 70, 100, 30, 'T1 · e1(X)', 'b'], ['box', 'b2', 350, 70, 110, 30, 'T2 · e2(Y)', 'o'], ['w', 2600], ['box', 'q', 120, 140, 240, 40, '¿Equivale a una serie?', 'g']]),
     B('Para saberlo hay dos criterios: equivalencia por conflictos y equivalencia de vistas. Ya viene el grafo, agárrese.',
       [['clr'], ['box', 'x', 40, 80, 190, 50, 'por CONFLICTOS\n(grafo)', 'b'], ['box', 'y', 250, 80, 190, 50, 'de VISTAS', 'p']])
-  ], { q: '¿Qué significa que una planificación sea serializable?', o: ['Equivale a una serie', 'No se intercala', 'Todas confirman'], why: 'No hace falta ir en serie: basta con producir el mismo efecto que algún orden en serie.' },
+  ], { q: '¿Qué significa que una planificación sea serializable?', o: ['Equivale a una serie', 'Que no se intercala nada', 'Que todas confirman'], why: 'No hace falta ir en serie: basta con producir el mismo efecto que algún orden en serie.' },
   ['Planificación: intercala operaciones y respeta el orden interno de cada transacción.', 'Serie: una completa y luego la otra.', 'Serializable: equivale a alguna ejecución en serie.']);
 
   add('p2l2', 'estacion', [
@@ -221,7 +221,7 @@ window.SCENES = (function () {
       [['clr'], ['box', 'h', 30, 60, 200, 70, 'HEURÍSTICA\nreglas: filtrar primero', 'p'], ['box', 'k', 250, 60, 200, 70, 'BASADA EN COSTOS\nestadísticas', 'g']]),
     B('Ejemplo de los vinos: quinientos vinos y mil doscientas cosechas, pero solo cien cosechas tienen cantidad mayor que cien. Si filtra primero y después hace el join, trabaja con cien filas en vez de mil doscientas. Así sí.',
       [['clr'], ['box', 'v', 30, 50, 130, 40, 'Vinos: 500', 'b'], ['box', 'c', 30, 110, 130, 40, 'Cosechas: 1200', 'o'], ['w', 3400], ['arrow', 'f', 162, 130, 250, 130, 'g', 'cantidad > 100'], ['box', 'r', 255, 110, 120, 40, '100 filas', 'v'], ['w', 1500], ['txt', 't', 240, 200, 'selección → join → proyección', 'v', 12]])
-  ], { q: 'En el ejemplo de los vinos, filtrar Cosechas antes del JOIN aplica la regla de...', o: ['Reducir filas lo antes posible', 'Proyectar todo al inicio', 'Hacer el producto primero'], why: 'La heurística dice aplicar primero las condiciones de selección: el JOIN trabaja con 100 filas y no con 1200.' },
+  ], { q: 'En el ejemplo de los vinos, filtrar Cosechas antes del JOIN aplica la regla de...', o: ['Reducir filas lo antes posible', 'Proyectar todas las columnas al inicio', 'Hacer primero el producto cartesiano'], why: 'La heurística dice aplicar primero las condiciones de selección: el JOIN trabaja con 100 filas y no con 1200.' },
   ['Optimizar: el SGBD elige el plan de menor costo.', 'Heurística: reglas. Basada en costos: estadísticas.', 'Filtrar temprano reduce el trabajo.']);
 
   add('p4l2', 'mercado', [

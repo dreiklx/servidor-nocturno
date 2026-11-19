@@ -26,6 +26,8 @@
     if (coarse) show(true);
     window.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { show(true); rotateHint(); } }, { passive: true });
     window.addEventListener('resize', rotateHint); rotateHint();
+    // con una ventana abierta (diálogo, combate, video) todo se toca directamente: se ocultan los controles
+    setInterval(() => { const busy = !!(window.UI && UI.busy && UI.busy()) || !document.getElementById('hud') || document.getElementById('hud').hidden; document.body.classList.toggle('modal-open', busy); if (busy && held.size) setDir([]); }, 150);
 
     let sid = null;
     function move(e) {
