@@ -20,7 +20,7 @@ CONTROLES
                En combate: 1-4 responder · H pista · J limoncito · K ver la pizarra
   Teléfono:    joystick a la izquierda · botón A para hablar y continuar · Correr
                En combates, videos y menús, toque las opciones directamente. Juegue en horizontal.
-  Videos:      Espacio o K pausa · J/L o Shift+flechas ±10 s · ← → tramo anterior/siguiente
+  Videos:      Espacio o K pausa · J/L o Shift+flechas ±10 s · ← → tramo anterior/siguiente · C subtítulos (CC, apagados al inicio)
                ↑ ↓ volumen · M silencia la narración · F pantalla completa · < > velocidad
                Arrastre la barra de progreso para ir a cualquier punto. En el teléfono, un toque
                muestra los controles y otro pausa.

@@ -9,13 +9,14 @@ window.VIDEO = (function () {
   const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   let voiceStatus = null; // null = sin probar, true = hay voz, false = falta algún audio
   const RATES = [0.5, 1, 1.25, 1.5, 2];
-  let rate = 1, vol = 1, vmuted = false;
+  let rate = 1, vol = 1, vmuted = false, cc = false;
   try {
     const r = parseFloat(localStorage.getItem('nd_video_rate'));
     // las velocidades viejas (0,8 a 1,4) se pasan a la más cercana de la lista nueva
     if (isFinite(r)) rate = RATES.reduce((a, b) => Math.abs(b - r) < Math.abs(a - r) ? b : a, 1);
     const v = parseFloat(localStorage.getItem('nd_video_vol')); if (isFinite(v)) vol = Math.max(0, Math.min(1, v));
     vmuted = localStorage.getItem('nd_video_muted') === '1';
+    cc = localStorage.getItem('nd_video_cc') === '1'; // subtítulos: apagados salvo que el jugador los active
   } catch (e) { /* sin almacenamiento */ }
   const keep = (k, v) => { try { localStorage.setItem(k, String(v)); } catch (e) { /* sin almacenamiento */ } };
   // iOS no deja cambiar el volumen de un <audio> desde la página (siempre vale 1): ahí solo se ofrece silenciar
@@ -287,6 +288,7 @@ window.VIDEO = (function () {
               <div class="v-vol"><button class="v-mute" aria-label="Silenciar la narración" title="Silenciar (M)">${IC.vol}</button><input class="v-volr" type="range" min="0" max="1" step="0.05" aria-label="Volumen de la narración"></div>
               <span class="v-time"><span class="v-cur">0:00</span><span class="v-sep"> / </span><span class="v-dur">0:00</span></span>
               <span class="v-grow"></span>
+              <button class="v-cc" aria-pressed="false" aria-label="Subtítulos" title="Subtítulos (C)">CC</button>
               <label class="v-rate"><span>Velocidad</span><select aria-label="Velocidad de reproducción">${RATES.map(r => `<option value="${r}"${r === rate ? ' selected' : ''}>${rateLabel(r)}</option>`).join('')}</select></label>
               <button class="v-board2" title="Abrir la pizarra con los detalles">Pizarra</button>
               <button class="v-fs" aria-label="Pantalla completa" title="Pantalla completa (F)">${IC.fs}</button>
@@ -613,6 +615,7 @@ window.VIDEO = (function () {
         else if (k === 'ArrowDown' && VOL_OK) setVol((vmuted ? 0 : vol) - 0.1);
         else if (k === 'm' || k === 'M') toggleMute();
         else if (k === 'f' || k === 'F') toggleFs();
+        else if (k === 'c' || k === 'C') $('.v-cc').click();
         else if (k === '>' || k === '<') { const i = RATES.indexOf(rate) + (k === '>' ? 1 : -1); if (RATES[i]) setRate(RATES[i]); }
         else if (k === 'Escape') { if (pseudoFs) exitFs(); else finish('skip'); }
         else if (phase === 'quiz' && /^[1-3]$/.test(k)) { const b = m.querySelectorAll('.vq-o button')[+k - 1]; if (b && !b.disabled) b.click(); }
@@ -624,6 +627,11 @@ window.VIDEO = (function () {
         if (phase === 'quiz') { const b = m.querySelector('.vq-o button[data-i="0"]'); if (b && !b.disabled) b.click(); }
         else if (phase === 'recap') finish('done');
       };
+      // subtítulos (CC): solo muestran u ocultan el texto; la narración sigue igual
+      const paintCc = () => { m.classList.toggle('cc-on', cc); const b = $('.v-cc'); b.setAttribute('aria-pressed', String(cc)); b.classList.toggle('on', cc); };
+      const toggleCc = () => { cc = !cc; keep('nd_video_cc', cc ? 1 : 0); paintCc(); osd(cc ? 'Subtítulos activados' : 'Subtítulos desactivados'); };
+      tapBtn('.v-cc', toggleCc);
+      paintCc();
       setVoiceLabel(); applyVol(); layoutChapters();
       if (opt.start === 'quiz') { beat = total - 1; showQuiz(); } else if (opt.start === 'recap') showRecap(); else goBeat(opt.beat || 0);
       if (opt.freeze) { playing = false; }
