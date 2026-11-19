@@ -1020,7 +1020,10 @@
     if (window.INSTALL && INSTALL.canOffer()) items.push({ label: 'Instalar aplicación', sub: 'Pantalla completa y sin internet' });
     const k = await UI.menu('Menú', items, { cls: 'title-menu', cancel: false });
     if (k === 0) {
-      if (saved) { const c = await UI.menu('¿Empezar de cero?', [{ label: 'Sí, nueva partida', sub: 'Se borra el progreso guardado' }, { label: 'No, volver' }]); if (c !== 0) return toTitle(); }
+      if (saved) {
+        const yes = await UI.confirm({ title: '¿INICIAR UNA NUEVA PARTIDA?', text: 'Tienes una partida anterior guardada. Si continúas, comenzarás desde cero.', no: 'CANCELAR', yes: 'SÍ, NUEVA PARTIDA', danger: true });
+        if (!yes) return toTitle(); // la partida guardada queda intacta
+      }
       S = fresh(); S.started = true; titleEl.hidden = true; await story(); return enterPhase(0);
     }
     if (k === 1) { S = saved; titleEl.hidden = true; return enterPhase(S.phase, { quiet: false }); }
@@ -1043,12 +1046,16 @@
     await UI.dialog(['Kai, ¿me copia? Habla Mauricio, desde la Torre del Servidor.', 'Hay que restaurar cinco núcleos antes del amanecer. En cada zona hay enseñanzas con lo que necesita saber: véalas con calma, que después se lo pregunto.', 'Cuando termine, suba a la Torre. Yo mismo voy a revisar que todo quedó bien.'], { name: 'Profe Mauricio (radio)', portrait: SPR.mauPortrait() });
   }
   async function howTo() {
-    await UI.card('Cómo jugar', `<ul class="howto">
+    const p = UI.card('Cómo jugar', `<ul class="howto">
       <li><b>Computadora:</b> <kbd>WASD</kbd>/<kbd>flechas</kbd> moverse · <kbd>Shift</kbd> correr · <kbd>E</kbd>/<kbd>Espacio</kbd> hablar o usar · <kbd>L</kbd> Libreta · <kbd>M</kbd> sonido · <kbd>Esc</kbd> pausa</li>
       <li><b>Teléfono:</b> joystick a la izquierda, botón <b>A</b> para hablar y continuar, <b>Correr</b> para ir más rápido. Toque las respuestas.</li>
       <li><b>Combates:</b> responda bien y Kai ataca; si falla, el enemigo ataca, ve por qué y esa pregunta vuelve en el mismo combate. <kbd>1</kbd>-<kbd>4</kbd> responder · <kbd>H</kbd> pista · <kbd>J</kbd> limoncito · <kbd>K</kbd> pizarra.</li></ul>
       <p><b>Cada fase:</b> hablar con el guía → ver las enseñanzas (video narrado + pizarra) → vencer enemigos y superar pruebas → pasar por Erika Ceviches → jefe. Arriba a la derecha siempre dice qué falta.</p>
-      <p>Solo le preguntan lo que ya vio. Si se queda sin energía, Erika lo recoge y no pierde lo avanzado. Los <b>limoncitos</b> descartan una opción incorrecta.</p>`, 'Entendido');
+      <p>Solo le preguntan lo que ya vio. Si se queda sin energía, Erika lo recoge y no pierde lo avanzado. Los <b>limoncitos</b> descartan una opción incorrecta.</p>
+      <p class="hw-live-row"><b>Evento especial:</b> a veces Erika Ceviches «sale en directo». Es un directo simulado del juego y no cambia la partida. <button class="btn ghost hw-live">¿Cómo funciona?</button></p>`, 'Entendido');
+    const b = document.querySelector('.hw-live');
+    if (b && window.LIVE) b.addEventListener('click', () => LIVE.info());
+    await p;
   }
   async function material() {
     await UI.card('Material del curso usado', `<p>Todo el contenido sale de la carpeta <code>Bases Examen 3</code> (IF0010 Bases de Datos II):</p><ul>

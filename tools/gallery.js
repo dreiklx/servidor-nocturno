@@ -5,6 +5,7 @@ const dir = path.join(__dirname, '..', 'screenshots');
 let notes = {}; try { JSON.parse(fs.readFileSync(path.join(dir, 'capturas_jefes.json'), 'utf8')).forEach(n => { notes[n.dir + '/' + n.file] = n.note; }); } catch (e) { /* sin notas */ }
 for (const d of ['mau_cinematica', 'mau_cinematica_movil']) { try { JSON.parse(fs.readFileSync(path.join(dir, d, 'capturas.json'), 'utf8')).forEach(n => { notes[d + '/' + n.file] = n.note; }); } catch (e) { /* sin notas */ } }
 const SECTIONS = [
+  ['v7_correcciones', 'Correcciones v7: Nueva partida, menú de título y ayuda del evento', 'La confirmación de Nueva partida y el menú de título en 7 tamaños (teléfonos, tablet y escritorio), y la ayuda del evento de Erika.'],
   ['mau_cinematica', 'Mau · El último servidor (expansión cinematográfica)', 'Revelación, menú exclusivo, los tres actos, el epílogo con la recuperación del control, la revancha y una pista por radio. Escritorio 1280×720.'],
   ['mau_cinematica_movil', 'Mau en el teléfono', 'La misma pelea en un teléfono emulado (915×412), con toques reales.'],
   ['mau', 'Profe Mauricio · versión anterior de la pelea', 'Introducción, los tres actos con sus cambios, ataques, herramientas, derrota de Mau, pantalla final y también qué pasa si Kai pierde.'],

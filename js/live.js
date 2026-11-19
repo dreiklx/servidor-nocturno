@@ -74,7 +74,7 @@ window.LIVE = (function () {
     return new Promise(resolve => {
       const m = UI.h('div', 'modal live-modal');
       m.innerHTML = `
-        <div class="lv-banner"><span class="lv-sim">DIRECTO SIMULADO</span> Este evento ocurre solo dentro de Servidor Nocturno. No es una transmisión real.</div>
+        <div class="lv-banner"><span class="lv-sim">DIRECTO SIMULADO</span> Este evento ocurre solo dentro de Servidor Nocturno. No es una transmisión real. <button class="lv-help">¿Qué es esto?</button></div>
         <div class="lv-phone">
           <canvas width="360" height="640"></canvas>
           <div class="lv-head"><div class="lv-ava"></div><div><b>Erika Ceviches</b><small>Puesto del Muelle</small></div><span class="live-pill"><i></i>LIVE</span><span class="lv-views">👁 <b>0</b></span></div>
@@ -147,6 +147,7 @@ window.LIVE = (function () {
         UI.close(m); resolve();
       }
       m.querySelector('.lv-back').addEventListener('click', close);
+      m.querySelector('.lv-help').addEventListener('click', e => { e.stopPropagation(); info(); });
       UI.open(m, e => { if (e.key === 'Escape' || e.key === 'Enter') close(); else if (e.key === ' ') { e.preventDefault(); tapHeart(); } });
       raf = requestAnimationFrame(draw);
     });
@@ -158,5 +159,30 @@ window.LIVE = (function () {
     return c;
   }
 
-  return { tick, trigger, open };
+  /* Ayuda: explica el evento tal como está programado arriba (FIRST_AT, EVERY, CHANCE, CHAT, SAY). */
+  function info() {
+    const pct = Math.round(CHANCE * 100), first = Math.round(FIRST_AT / 60 * 10) / 10;
+    const html = `<div class="li-wrap">
+      <p class="li-sim"><span class="live-pill"><i></i>LIVE</span> <b>DIRECTO SIMULADO.</b> Ocurre solo dentro de Servidor Nocturno. No es una transmisión real de TikTok, no se conecta a internet ni a ninguna cuenta.</p>
+      <h3>¿Qué es?</h3>
+      <p>Un evento sorpresa y humorístico: Erika Ceviches «transmite en vivo» desde su puesto del muelle.</p>
+      <h3>¿Cuándo aparece?</h3>
+      <ul><li>Solo mientras explora libremente el mapa: nunca durante combates, videos, pruebas, diálogos ni menús.</li>
+        <li>Después de ${String(first).replace('.', ',')} minutos de exploración en la sesión, cada ${EVERY} segundos hay un ${pct} % de probabilidad. En promedio aparece una vez cada 10 a 15 minutos de exploración.</li>
+        <li>Es aleatorio y sale como máximo una vez cada vez que abre el juego.</li></ul>
+      <h3>¿Qué pasa cuando aparece?</h3>
+      <ul><li>Arriba aparece un aviso con la insignia LIVE y un sonido. Puede tocar <b>Ver</b> o cerrarlo; si no hace nada, se va solo en unos 11 segundos.</li>
+        <li>Con <b>Ver</b>, el juego se pausa y se abre el directo: Erika en su puesto, corazones, espectadores que suben, frases de Erika y un chat.</li>
+        <li>En el chat escriben Kai, otros personajes del puerto, los jefes de las fases (el Pirata, la Locomotora, la Tormenta, el Full Scan y el Kraken) y hasta el Profe Mauricio, con chistes de bases de datos.</li>
+        <li>Dura unos 30 segundos y termina con «Erika terminó el directo». Vuelve al juego con el botón o con Esc.</li></ul>
+      <h3>¿Qué puede hacer?</h3>
+      <ul><li>Tocar la pantalla del directo (o Espacio) para mandar corazones.</li>
+        <li>No se puede escribir en el chat: los mensajes vienen ya preparados.</li></ul>
+      <h3>¿Afecta la partida?</h3>
+      <p>No. Es solo un momento visual: no da limoncitos ni energía, no guarda nada y no cambia preguntas, combates ni jefes. El «limoncito» que Kai regala en el chat es parte del chiste.</p>
+    </div>`;
+    return UI.card('Erika Ceviches en directo', html, 'Entendido', 'live-info');
+  }
+
+  return { tick, trigger, open, info };
 })();

@@ -1,0 +1,58 @@
+/* =====================================================================
+   v7 · correcciones de composición
+   Causa de los dos errores: los menús usan a la vez las clases .card y .menu, y
+   sus reglas se pisaban según el orden de los archivos:
+   - En teléfono, ".card { top: 3%; bottom: 3% }" (v2.css) anulaba el "top: 50%"
+     de .menu, pero quedaba su "translateY(-50%)": el cuadro subía media altura y
+     el título y los botones quedaban fuera de la pantalla.
+   - En el título, ".card.menu { left: 25% }" pisaba el centrado del menú de título,
+     que quedaba corrido a la izquierda tapando el logo y el subtítulo.
+   Aquí cada caso tiene reglas propias, más específicas, que no dependen del orden.
+   ===================================================================== */
+
+/* menús comunes (pausa, elegir fase, Erika, copia de seguridad...): centrados y siempre dentro */
+.modal.card.menu:not(.title-menu) { top: 50%; bottom: auto; height: auto; max-height: 92%; transform: translateY(-46%); overflow: hidden; }
+.modal.card.menu:not(.title-menu).in { transform: translateY(-50%); }
+.modal.card.menu .menu-list { min-height: 0; }
+
+/* menú de título: debajo del logo, en dos columnas; el logo, el subtítulo y la luna quedan a la vista */
+.modal.card.menu.title-menu { left: 50%; right: auto; top: 41%; bottom: auto; width: 68%; max-height: 53%; transform: translate(-50%, 8px); padding: .6em .9em .7em; }
+.modal.card.menu.title-menu.in { transform: translate(-50%, 0); }
+.modal.card.menu.title-menu h2 { font-size: 1.05em; margin: 0 0 .35em; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
+.modal.card.menu.title-menu .menu-list { display: grid; grid-template-columns: 1fr 1fr; gap: .35em .5em; }
+.modal.card.menu.title-menu .menu-item { padding: .3em .65em; min-width: 0; }
+.modal.card.menu.title-menu .menu-item .mi-s { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* teléfono horizontal y pantallas 4:3 o más angostas (tablets): logo a la izquierda y menú a la derecha.
+   En 4:3 el juego agranda la letra (style.css) y el logo ya no deja lugar debajo para el menú. */
+@media (max-height: 520px), (max-width: 900px), (max-aspect-ratio: 4/3) {
+  #title { right: 47%; display: flex; flex-direction: column; justify-content: center; }
+  #title .t-studio { margin-top: 0; }
+  #title h1 { font-size: 2.6em; }
+  #title .t-sub { font-size: .75em; padding: 0 1em; }
+  .modal.card.menu.title-menu, .modal.card.menu.title-menu.in { left: auto; right: 3%; top: 50%; bottom: auto; width: 44%; max-height: 88%; transform: translateY(-50%); }
+  .modal.card.menu.title-menu .menu-list { display: flex; flex-direction: column; gap: .3em; }
+  .modal.card.menu.title-menu h2 { font-size: 1.1em; }
+}
+
+/* ventana de confirmación (UI.confirm): ocupa toda la pantalla y centra el cuadro con flex */
+.modal.confirm { inset: 0; display: flex; align-items: center; justify-content: center; padding: 3% 4%; background: #05040bcc; z-index: 40; }
+.cf-box { width: min(100%, 30em); max-height: 100%; overflow: auto; background: linear-gradient(180deg, var(--panel2), var(--panel)); border: 3px solid var(--line); border-radius: 14px; padding: 1em 1.2em; box-shadow: 0 18px 50px #000c; display: flex; flex-direction: column; gap: .6em; text-align: center; transform: scale(.96); transition: transform .16s ease; }
+.modal.confirm.in .cf-box { transform: none; }
+.modal.confirm.danger .cf-box { border-color: #ff6b7a99; }
+.cf-box h2 { margin: 0; font-family: var(--pix); font-size: 1.3em; color: #fff; letter-spacing: .03em; text-wrap: balance; }
+.cf-box p { margin: 0; color: #dcdff7; line-height: 1.4; }
+.cf-btns { display: flex; gap: .6em; justify-content: center; flex-wrap: wrap; margin-top: .3em; }
+.cf-btns .btn { flex: 1 1 10em; min-height: max(2.6em, 44px); font-size: .95em; letter-spacing: .04em; }
+.cf-btns .cf-no { background: #ffffff14; border-color: var(--accent2); }
+.cf-btns .cf-yes { background: #ff6b7a26; border-color: var(--ko); color: #ffd6dc; }
+.cf-btns .cf-yes:hover { background: #ff6b7a44; }
+.cf-btns .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* ayuda del evento de Erika */
+.hw-live-row .btn { margin-left: .4em; padding: .2em .7em; font-size: .85em; }
+.modal.card.live-info .li-wrap h3 { font-family: var(--pix); color: var(--gold); margin: .7em 0 .2em; font-size: 1em; }
+.modal.card.live-info .li-wrap p, .modal.card.live-info .li-wrap li { line-height: 1.45; }
+.modal.card.live-info .li-wrap ul { margin: .2em 0; padding-left: 1.2em; }
+.modal.card.live-info .li-sim { background: #ff2d5518; border: 1px solid #ff2d5566; border-radius: 10px; padding: .5em .7em; }
+.modal.card.live-info { z-index: 36; }
+.lv-help { margin-left: .5em; font: inherit; font-size: .95em; color: #fff; background: #ffffff1a; border: 1px solid #ffffff44; border-radius: 99px; padding: .1em .7em; min-height: 2em; }

@@ -24,6 +24,7 @@ El índice se generó con **Graphify** el 2026-11-19 a partir del código (AST):
 | Sin conexión | `sw.js` y `manifest.webmanifest` | PWA instalable. `tools/build_sw.js` genera la lista de caché con un hash del contenido. Responde audio por partes (206) para Safari |
 | Instalación | `js/install.js` | Bienvenida en teléfonos: botón INSTALAR (Android), pasos de Compartir (iPhone), aviso en navegadores de otras apps; registra el service worker y avisa si hay versión nueva |
 | Evento | `js/live.js` | "Erika Ceviches en directo": evento simulado y poco frecuente durante el juego libre (`?live=1` lo fuerza) |
+| Correcciones v7 | `css/v7.css` y `UI.confirm` en `js/ui.js` | Posición de menús y confirmaciones sin depender del orden de los archivos CSS; menú de título debajo del logo (escritorio) o a la derecha (teléfono y 4:3); ventana de confirmación propia |
 | Estilos v5 | `css/v3.css` | Controles del reproductor, bienvenida móvil, aviso de girar, aviso de versión y el evento |
 | Jefe final (v6) | `js/mau.js` y `css/mau.css` | Revelación de Mau sobre el mapa real (cámara, zoom, oscuridad, silueta, interferencias), menú exclusivo por acto, apariencia del combate por acto, transiciones, epílogo con la recuperación del control y las pistas por radio. game.js expone `window.GAMECINE` (cámara, zoom y cómo se ve Mau) y ui.js acepta `cfg.skin`/`cfg.fx` solo para presentación |
 
@@ -51,6 +52,7 @@ En los combates, responder bien hace que Kai ataque. Si se falla, el enemigo ata
 | `boss_shots.js` | Juega cada combate de jefe y el de Mau completos y captura cada etapa en `screenshots/` |
 | `gallery.js` | Genera `screenshots/index.html` |
 | `test_v5.js` | Pruebas del reproductor, la instalación, el modo sin conexión y el evento |
+| `test_v7.js` | Nueva partida con partida guardada (confirmación, cancelar, confirmar), menú de título sin tapar textos y ayuda del evento, en 7 tamaños de pantalla con toques reales |
 | `test_mau.js` | Juega la pelea contra Mau completa (también con `MOBILE=1`): escenas, menús, tres actos, epílogo, saltar escena, derrota de Kai, radio, audio sin pistas duplicadas; con una carpeta como argumento guarda las capturas |
 | `gen_splash.js` | Pantallas de arranque de iPhone (`assets/splash`) |
 | `voice_lines.js` → `synth_qwen.py` → `encode_voice.sh` | Narración con Qwen3-TTS desde el entorno de Story Lab y conversión a MP3 |

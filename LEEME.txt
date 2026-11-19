@@ -32,6 +32,7 @@ CÓMO SE JUEGA
   Cada enseñanza: primero el video (velocidad de 0,5x a 2x, volumen, ±10 s y pantalla completa) y después la pizarra con los detalles.
   De vez en cuando, mientras explora, puede aparecer un aviso: "Erika Ceviches está en directo".
   Es un evento del juego (simulado): no se conecta a TikTok ni a ninguna cuenta real.
+  Cómo jugar → "¿Cómo funciona?" explica cuándo aparece y qué se puede hacer.
   La pizarra también se abre en cualquier momento con el botón "Pizarra" del video, y queda en la Libreta (L).
   Responder bien = Kai ataca. Si falla, verá por qué, y esa pregunta vuelve en el mismo combate.
   El Profe Mauricio, al final, repasa las 5 fases y empieza por lo que usted falló.
@@ -58,6 +59,7 @@ PARA DESARROLLAR
   node tools/run_autotest.js          juega todo automáticamente (requiere el servidor)
   node tools/build_sw.js              regenera la lista offline (después de cambiar archivos)
   node tools/test_v5.js               prueba reproductor, instalación, modo sin conexión y el evento
+  node tools/test_v7.js [url] [carpeta]  Nueva partida, menú de título y ayuda del evento en 7 tamaños
   node tools/test_mau.js [carpeta]    juega la pelea contra Mau completa y guarda capturas (MOBILE=1 en teléfono)
   node tools/boss_shots.js            capturas reales de cada jefe y sus etapas (carpeta screenshots/)
   node tools/capture.js tools/plans/<plan>.json   capturas por guion (video, teléfono, evento)

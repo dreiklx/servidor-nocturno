@@ -403,6 +403,35 @@ window.UI = (function () {
     });
   }
 
-  const api = { init, h, esc, open, close, busy, key, toast, dialog, lesson, menu, card, battle, notebook, wait, AUTO, portraitEl, theme: 'muelle' };
+  /* ---------------- Confirmación con dos botones ----------------
+     Centrada con flex en toda la pantalla (no depende de top ni de translate) y con scroll
+     interno si no cabe. "Cancelar" queda enfocado por defecto y, durante los primeros 400 ms,
+     se ignoran los toques: el mismo toque que abrió la ventana no puede confirmar por accidente.
+     Tocar fuera del cuadro o Esc = cancelar. */
+  function confirm(o = {}) {
+    return new Promise(resolve => {
+      if (AUTO) { resolve(o.auto != null ? !!o.auto : false); return; }
+      const m = h('div', 'modal confirm' + (o.danger ? ' danger' : ''));
+      m.setAttribute('role', 'alertdialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-labelledby', 'cf-title'); m.setAttribute('aria-describedby', 'cf-text');
+      m.innerHTML = '<div class="cf-box"><h2 id="cf-title">' + esc(o.title || '¿Continuar?') + '</h2><p id="cf-text">' + esc(o.text || '') + '</p>' +
+        '<div class="cf-btns"><button class="btn cf-no">' + esc(o.no || 'Cancelar') + '</button><button class="btn cf-yes">' + esc(o.yes || 'Aceptar') + '</button></div></div>';
+      const no = m.querySelector('.cf-no'), yes = m.querySelector('.cf-yes'), t0 = performance.now();
+      let done = false;
+      const armed = () => performance.now() - t0 > 400;
+      const fin = v => { if (done) return; done = true; if (AUDIO.fx.page) AUDIO.fx.page(); close(m); resolve(v); };
+      no.addEventListener('click', e => { e.stopPropagation(); if (armed()) fin(false); });
+      // un toque que llega antes de tiempo se ignora y el foco vuelve a "Cancelar" (si no, un Enter confirmaría)
+      yes.addEventListener('click', e => { e.stopPropagation(); if (armed()) fin(true); else no.focus({ preventScroll: true }); });
+      m.addEventListener('click', e => { if (e.target === m && armed()) fin(false); });
+      open(m, e => {
+        if (e.key === 'Escape') { e.preventDefault(); fin(false); }
+        else if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab'].includes(e.key)) { e.preventDefault(); (document.activeElement === no ? yes : no).focus(); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (armed()) fin(document.activeElement === yes); }
+      });
+      setTimeout(() => no.focus({ preventScroll: true }), 30);
+    });
+  }
+
+  const api = { init, h, esc, open, close, busy, key, toast, dialog, lesson, menu, confirm, card, battle, notebook, wait, AUTO, portraitEl, theme: 'muelle' };
   return api;
 })();
