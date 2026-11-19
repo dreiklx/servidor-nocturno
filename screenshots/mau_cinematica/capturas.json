@@ -1,0 +1,146 @@
+[
+ {
+  "file": "01_habitacion_antes.png",
+  "note": "La cima de la Torre antes de la revelación: la consola del Servidor Central y nadie a la vista."
+ },
+ {
+  "file": "02_habitacion_segura.png",
+  "note": "Kai llega: la consola está encendida, pero no hay nadie."
+ },
+ {
+  "file": "03_habitacion_a_oscuras.png",
+  "note": "Las luces se apagan y la consola cambia a rojo."
+ },
+ {
+  "file": "04_voz_en_la_oscuridad.png",
+  "note": "Mau habla sin aparecer; la cámara recorre la habitación."
+ },
+ {
+  "file": "05_silencio.png",
+  "note": "Silencio total antes del interruptor."
+ },
+ {
+  "file": "06_silueta.png",
+  "note": "Clic del interruptor: un foco revela una silueta."
+ },
+ {
+  "file": "07_la_camara_se_acerca.png",
+  "note": "La cámara se acerca despacio a la silueta."
+ },
+ {
+  "file": "08_revelacion.png",
+  "note": "Es el Profe Mauricio."
+ },
+ {
+  "file": "09_titulo_jefe_final.png",
+  "note": "Título del jefe final."
+ },
+ {
+  "file": "10_titulo_mau.png",
+  "note": "Título en pantalla."
+ },
+ {
+  "file": "11_menu_acto1.png",
+  "note": "Menú exclusivo antes del Acto I."
+ },
+ {
+  "file": "12_acto1_inicio.png",
+  "note": "Inicio del combate del Acto I."
+ },
+ {
+  "file": "13_acto1_ataque_de_mau.png",
+  "note": "Error de Kai: ataque de Mau con interferencia."
+ },
+ {
+  "file": "14_acto1_combate.png",
+  "note": "Combate del Acto I: ataque de Kai."
+ },
+ {
+  "file": "15_acto1_mau_cae.png",
+  "note": "Último acierto del Acto I."
+ },
+ {
+  "file": "16_transicion_acto2.png",
+  "note": "Transición al Acto II: luz roja e interferencia."
+ },
+ {
+  "file": "17_act2_titulo.png",
+  "note": "Título en pantalla."
+ },
+ {
+  "file": "18_menu_acto2.png",
+  "note": "Menú exclusivo antes del Acto II."
+ },
+ {
+  "file": "19_acto2_inicio.png",
+  "note": "Inicio del combate del Acto II."
+ },
+ {
+  "file": "20_acto2_combate.png",
+  "note": "Combate del Acto II: ataque de Kai."
+ },
+ {
+  "file": "21_acto2_mau_cae.png",
+  "note": "Último acierto del Acto II."
+ },
+ {
+  "file": "22_transicion_acto3.png",
+  "note": "Transición al Acto III: tormenta y datos que fluyen hacia Mau."
+ },
+ {
+  "file": "23_act3_titulo.png",
+  "note": "Título en pantalla."
+ },
+ {
+  "file": "24_menu_acto3.png",
+  "note": "Menú exclusivo antes del Acto III."
+ },
+ {
+  "file": "25_acto3_inicio.png",
+  "note": "Inicio del combate del Acto III."
+ },
+ {
+  "file": "26_acto3_combate.png",
+  "note": "Combate del Acto III: ataque de Kai."
+ },
+ {
+  "file": "27_acto3_mau_cae.png",
+  "note": "Último acierto del Acto III."
+ },
+ {
+  "file": "28_derrota_de_mau.png",
+  "note": "Derrota de Mau: los datos lo abandonan."
+ },
+ {
+  "file": "29_kai_va_a_la_consola.png",
+  "note": "Kai camina hasta la consola."
+ },
+ {
+  "file": "30_servidor_central_bajo_mau.png",
+  "note": "El panel del Servidor Central: los cinco núcleos encadenados al usuario de Mau."
+ },
+ {
+  "file": "31_recuperando_el_control.png",
+  "note": "Kai revoca los permisos: los núcleos pasan uno por uno a todo el puerto."
+ },
+ {
+  "file": "32_amanecer.png",
+  "note": "Control recuperado: la Torre pasa a azul y amanece."
+ },
+ {
+  "file": "33_amanece_en_puerto_nyder.png",
+  "note": "Título de cierre."
+ },
+ {
+  "file": "34_pantalla_final.png",
+  "note": "Pantalla final con las consecuencias de la traición."
+ },
+ {
+  "file": "35_revancha_saltar_escena.png",
+  "note": "En la revancha se puede saltar la escena."
+ },
+ {
+  "file": "36_pista_por_radio.png",
+  "note": "Pista por radio al cerrar la Fase 3 (\"ya están en mis manos... digo, a salvo\")."
+ }
+]

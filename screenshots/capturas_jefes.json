@@ -1,0 +1,547 @@
+[
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "01_jefe_en_el_mapa.png",
+  "note": "El jefe esperando en su zona del mapa, antes de hablarle."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "02_presentacion.png",
+  "note": "Diálogo de presentación del jefe."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "03_combate_inicio.png",
+  "note": "Arranque del combate: vida del jefe, energía de Kai y la primera pregunta."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "04_pista.png",
+  "note": "Herramienta \"Pista\" (H)."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "05_ataque_de_kai.png",
+  "note": "Respuesta correcta: Kai ataca (animación en curso)."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "06_respuesta_correcta.png",
+  "note": "Explicación de la respuesta correcta."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "07_ataque_del_jefe.png",
+  "note": "Respuesta incorrecta: el jefe ataca y Kai pierde energía."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "08_respuesta_incorrecta.png",
+  "note": "Se muestra la correcta y por qué; la pregunta volverá en este combate."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "09_limoncito.png",
+  "note": "Herramienta \"Limoncito\" (J): descarta opciones incorrectas."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "10_otra_oportunidad.png",
+  "note": "La pregunta fallada vuelve: \"Otra oportunidad\"."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "11_jefe_al_limite.png",
+  "note": "Al jefe le queda un solo golpe."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "12_golpe_final.png",
+  "note": "Golpe final: el ataque que deja al jefe sin vida."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "13_derrota_del_jefe.png",
+  "note": "Mensaje de victoria del combate."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "14_dialogo_de_derrota.png",
+  "note": "Lo que dice el jefe al perder."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "15_portal_abierto.png",
+  "note": "Núcleo restaurado: aparece el portal y el aviso."
+ },
+ {
+  "dir": "boss_01_pirata_lectosucio",
+  "file": "16_despues_del_combate.png",
+  "note": "El mapa después del combate, con el portal activo."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "01_jefe_en_el_mapa.png",
+  "note": "El jefe esperando en su zona del mapa, antes de hablarle."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "02_presentacion.png",
+  "note": "Diálogo de presentación del jefe."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "03_combate_inicio.png",
+  "note": "Arranque del combate: vida del jefe, energía de Kai y la primera pregunta."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "04_pista.png",
+  "note": "Herramienta \"Pista\" (H)."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "05_ataque_de_kai.png",
+  "note": "Respuesta correcta: Kai ataca (animación en curso)."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "06_respuesta_correcta.png",
+  "note": "Explicación de la respuesta correcta."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "07_ataque_del_jefe.png",
+  "note": "Respuesta incorrecta: el jefe ataca y Kai pierde energía."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "08_respuesta_incorrecta.png",
+  "note": "Se muestra la correcta y por qué; la pregunta volverá en este combate."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "09_limoncito.png",
+  "note": "Herramienta \"Limoncito\" (J): descarta opciones incorrectas."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "10_otra_oportunidad.png",
+  "note": "La pregunta fallada vuelve: \"Otra oportunidad\"."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "11_jefe_al_limite.png",
+  "note": "Al jefe le queda un solo golpe."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "12_golpe_final.png",
+  "note": "Golpe final: el ataque que deja al jefe sin vida."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "13_derrota_del_jefe.png",
+  "note": "Mensaje de victoria del combate."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "14_dialogo_de_derrota.png",
+  "note": "Lo que dice el jefe al perder."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "15_portal_abierto.png",
+  "note": "Núcleo restaurado: aparece el portal y el aviso."
+ },
+ {
+  "dir": "boss_02_locomotora_interbloqueo",
+  "file": "16_despues_del_combate.png",
+  "note": "El mapa después del combate, con el portal activo."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "01_jefe_en_el_mapa.png",
+  "note": "El jefe esperando en su zona del mapa, antes de hablarle."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "02_presentacion.png",
+  "note": "Diálogo de presentación del jefe."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "03_combate_inicio.png",
+  "note": "Arranque del combate: vida del jefe, energía de Kai y la primera pregunta."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "04_pista.png",
+  "note": "Herramienta \"Pista\" (H)."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "05_ataque_de_kai.png",
+  "note": "Respuesta correcta: Kai ataca (animación en curso)."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "06_respuesta_correcta.png",
+  "note": "Explicación de la respuesta correcta."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "07_ataque_del_jefe.png",
+  "note": "Respuesta incorrecta: el jefe ataca y Kai pierde energía."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "08_respuesta_incorrecta.png",
+  "note": "Se muestra la correcta y por qué; la pregunta volverá en este combate."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "09_otra_oportunidad.png",
+  "note": "La pregunta fallada vuelve: \"Otra oportunidad\"."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "10_limoncito.png",
+  "note": "Herramienta \"Limoncito\" (J): descarta opciones incorrectas."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "11_jefe_al_limite.png",
+  "note": "Al jefe le queda un solo golpe."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "12_golpe_final.png",
+  "note": "Golpe final: el ataque que deja al jefe sin vida."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "13_derrota_del_jefe.png",
+  "note": "Mensaje de victoria del combate."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "14_dialogo_de_derrota.png",
+  "note": "Lo que dice el jefe al perder."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "15_portal_abierto.png",
+  "note": "Núcleo restaurado: aparece el portal y el aviso."
+ },
+ {
+  "dir": "boss_03_tormenta_corrupta",
+  "file": "16_despues_del_combate.png",
+  "note": "El mapa después del combate, con el portal activo."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "01_jefe_en_el_mapa.png",
+  "note": "El jefe esperando en su zona del mapa, antes de hablarle."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "02_presentacion.png",
+  "note": "Diálogo de presentación del jefe."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "03_combate_inicio.png",
+  "note": "Arranque del combate: vida del jefe, energía de Kai y la primera pregunta."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "04_pista.png",
+  "note": "Herramienta \"Pista\" (H)."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "05_ataque_de_kai.png",
+  "note": "Respuesta correcta: Kai ataca (animación en curso)."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "06_respuesta_correcta.png",
+  "note": "Explicación de la respuesta correcta."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "07_ataque_del_jefe.png",
+  "note": "Respuesta incorrecta: el jefe ataca y Kai pierde energía."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "08_respuesta_incorrecta.png",
+  "note": "Se muestra la correcta y por qué; la pregunta volverá en este combate."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "09_limoncito.png",
+  "note": "Herramienta \"Limoncito\" (J): descarta opciones incorrectas."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "10_otra_oportunidad.png",
+  "note": "La pregunta fallada vuelve: \"Otra oportunidad\"."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "11_jefe_al_limite.png",
+  "note": "Al jefe le queda un solo golpe."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "12_golpe_final.png",
+  "note": "Golpe final: el ataque que deja al jefe sin vida."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "13_derrota_del_jefe.png",
+  "note": "Mensaje de victoria del combate."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "14_dialogo_de_derrota.png",
+  "note": "Lo que dice el jefe al perder."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "15_portal_abierto.png",
+  "note": "Núcleo restaurado: aparece el portal y el aviso."
+ },
+ {
+  "dir": "boss_04_el_gran_full_scan",
+  "file": "16_despues_del_combate.png",
+  "note": "El mapa después del combate, con el portal activo."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "01_jefe_en_el_mapa.png",
+  "note": "El jefe esperando en su zona del mapa, antes de hablarle."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "02_presentacion.png",
+  "note": "Diálogo de presentación del jefe."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "03_combate_inicio.png",
+  "note": "Arranque del combate: vida del jefe, energía de Kai y la primera pregunta."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "04_pista.png",
+  "note": "Herramienta \"Pista\" (H)."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "05_ataque_de_kai.png",
+  "note": "Respuesta correcta: Kai ataca (animación en curso)."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "06_respuesta_correcta.png",
+  "note": "Explicación de la respuesta correcta."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "07_ataque_del_jefe.png",
+  "note": "Respuesta incorrecta: el jefe ataca y Kai pierde energía."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "08_respuesta_incorrecta.png",
+  "note": "Se muestra la correcta y por qué; la pregunta volverá en este combate."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "09_limoncito.png",
+  "note": "Herramienta \"Limoncito\" (J): descarta opciones incorrectas."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "10_otra_oportunidad.png",
+  "note": "La pregunta fallada vuelve: \"Otra oportunidad\"."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "11_jefe_al_limite.png",
+  "note": "Al jefe le queda un solo golpe."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "12_golpe_final.png",
+  "note": "Golpe final: el ataque que deja al jefe sin vida."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "13_derrota_del_jefe.png",
+  "note": "Mensaje de victoria del combate."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "14_dialogo_de_derrota.png",
+  "note": "Lo que dice el jefe al perder."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "15_portal_abierto.png",
+  "note": "Núcleo restaurado: aparece el portal y el aviso."
+ },
+ {
+  "dir": "boss_05_kraken_fragmentado",
+  "file": "16_despues_del_combate.png",
+  "note": "El mapa después del combate, con el portal activo."
+ },
+ {
+  "dir": "mau",
+  "file": "01_torre_mau_en_el_mapa.png",
+  "note": "La Torre del Servidor con el Profe Mauricio esperando."
+ },
+ {
+  "dir": "mau",
+  "file": "02_introduccion.png",
+  "note": "Introducción del Profe Mauricio."
+ },
+ {
+  "dir": "mau",
+  "file": "03_acto1_presentacion.png",
+  "note": "Presentación del Acto I · Transacciones y planificación."
+ },
+ {
+  "dir": "mau",
+  "file": "04_acto1_combate_inicio.png",
+  "note": "Arranque del combate del Acto I."
+ },
+ {
+  "dir": "mau",
+  "file": "05_acto1_pista.png",
+  "note": "Pista durante el examen final."
+ },
+ {
+  "dir": "mau",
+  "file": "06_acto1_ataque_de_mau.png",
+  "note": "Error: el Profe Mauricio \"ataca\"."
+ },
+ {
+  "dir": "mau",
+  "file": "07_acto1_respuesta_incorrecta.png",
+  "note": "Explicación y refuerzo: vuelve otra pregunta del mismo tema."
+ },
+ {
+  "dir": "mau",
+  "file": "08_acto1_ataque_de_kai.png",
+  "note": "Acierto: ataque de Kai."
+ },
+ {
+  "dir": "mau",
+  "file": "09_acto1_mau_vencido.png",
+  "note": "Último acierto del Acto I: el Profe Mauricio cae."
+ },
+ {
+  "dir": "mau",
+  "file": "10_acto1_superado.png",
+  "note": "Fin del Acto I."
+ },
+ {
+  "dir": "mau",
+  "file": "11_acto1_aviso_de_energia.png",
+  "note": "Aviso entre actos: acto superado y +2 de energía."
+ },
+ {
+  "dir": "mau",
+  "file": "12_acto2_presentacion.png",
+  "note": "Presentación del Acto II · Respaldo y optimización."
+ },
+ {
+  "dir": "mau",
+  "file": "13_acto2_combate_inicio.png",
+  "note": "Arranque del combate del Acto II."
+ },
+ {
+  "dir": "mau",
+  "file": "14_acto2_limoncito.png",
+  "note": "Limoncito durante el examen final."
+ },
+ {
+  "dir": "mau",
+  "file": "15_acto2_mau_vencido.png",
+  "note": "Último acierto del Acto II: el Profe Mauricio cae."
+ },
+ {
+  "dir": "mau",
+  "file": "16_acto2_superado.png",
+  "note": "Fin del Acto II."
+ },
+ {
+  "dir": "mau",
+  "file": "17_acto2_aviso_de_energia.png",
+  "note": "Aviso entre actos: acto superado y +2 de energía."
+ },
+ {
+  "dir": "mau",
+  "file": "18_acto3_presentacion.png",
+  "note": "Presentación del Acto III · Distribuidas y NoSQL, más un repaso de todo."
+ },
+ {
+  "dir": "mau",
+  "file": "19_acto3_combate_inicio.png",
+  "note": "Arranque del combate del Acto III."
+ },
+ {
+  "dir": "mau",
+  "file": "20_acto3_respuesta_correcta.png",
+  "note": "Explicación tras un acierto en el Acto III."
+ },
+ {
+  "dir": "mau",
+  "file": "21_acto3_mau_vencido.png",
+  "note": "Último acierto del Acto III: el Profe Mauricio cae."
+ },
+ {
+  "dir": "mau",
+  "file": "22_acto3_superado.png",
+  "note": "Fin del Acto III."
+ },
+ {
+  "dir": "mau",
+  "file": "23_dialogo_de_victoria.png",
+  "note": "El Profe Mauricio reconoce la victoria de Kai."
+ },
+ {
+  "dir": "mau",
+  "file": "24_pantalla_final.png",
+  "note": "Pantalla posterior: \"Amanece en Puerto Nyder\", resultados y créditos."
+ },
+ {
+  "dir": "mau",
+  "file": "51_kai_sin_energia.png",
+  "note": "Con 1 de energía, un error deja a Kai sin energía."
+ },
+ {
+  "dir": "mau",
+  "file": "52_kai_cae.png",
+  "note": "Animación de derrota de Kai."
+ },
+ {
+  "dir": "mau",
+  "file": "53_mau_gana_dialogo.png",
+  "note": "Mensaje del Profe Mauricio cuando Kai pierde."
+ },
+ {
+  "dir": "mau",
+  "file": "54_rescate_de_erika.png",
+  "note": "Después de perder: el rescate (Erika lleva a Kai a su puesto)."
+ },
+ {
+  "dir": "mau",
+  "file": "55_rescate_de_erika_2.png",
+  "note": "Continuación del rescate."
+ }
+]

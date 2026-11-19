@@ -11,8 +11,20 @@
   /* ======================= Estado y guardado ======================= */
   const SAVE_KEY = 'nightdare_bd2_v1';
   const fresh = () => ({ phase: 0, read: {}, talked: {}, defeated: {}, mg: {}, boss: {}, stats: {}, hearts: 5, maxHearts: 5, lemons: 3,
-    unlocked: 1, checkpoint: null, finalAct: 0, done: false, chelaSeen: {}, chelaLemon: {}, playMs: 0, started: false });
+    unlocked: 1, checkpoint: null, finalAct: 0, done: false, chelaSeen: {}, chelaLemon: {}, playMs: 0, started: false, mauSeen: false, mauRadio: {}, mauActs: {} });
   let S = fresh();
+  /* Escenas del jefe final (js/mau.js). Mientras hay escena, ella maneja la cámara, el zoom,
+     cómo se ve Mau (oculto, silueta o visible) y la consola; el juego sigue dibujando el mapa real. */
+  let cine = null;
+  window.GAMECINE = {
+    set(c) { cine = c; document.body.classList.toggle('cine', !!c); },
+    get: () => cine,
+    world() { const b = W && W.ents.find(e => e.type === 'boss'); return { boss: b ? { x: b.px, y: b.py } : null, player: { x: P.x, y: P.y }, cam: { x: cam.x, y: cam.y }, VW, VH, TS }; },
+    setPlayer(o) { Object.assign(P, o); },
+    state: () => S,
+    save: () => save(),
+    time: () => time
+  };
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); return true; } catch (e) { return false; } }
   function loadSave() { try { const s = localStorage.getItem(SAVE_KEY); return s ? Object.assign(fresh(), JSON.parse(s)) : null; } catch (e) { return null; } }
 
@@ -237,6 +249,7 @@
     weather(dt);
     if (mode !== 'play' || UI.busy() || fade > 0.01) { P.moving = false; return; }
     S.playMs += dt * 1000;
+    if (window.LIVE) LIVE.tick(dt); // evento sorpresa (simulado): solo cuenta el tiempo de juego libre
     // movimiento
     let dx = 0, dy = 0;
     if (keys.ArrowLeft || keys.a || keys.A) dx -= 1;
@@ -361,7 +374,10 @@
     if (mode === 'title' || mode === 'boot' || !W) { drawTitleBg(); return; }
     const th = W.theme;
     const sx = shake ? (Math.random() - 0.5) * shake : 0, sy = shake ? (Math.random() - 0.5) * shake : 0;
-    const ox = Math.round(cam.x + sx), oy = Math.round(cam.y + sy);
+    const cc = cine && cine.cam ? cine.cam : cam;
+    const ox = Math.round(cc.x + sx), oy = Math.round(cc.y + sy);
+    const zoom = cine && cine.zoom > 1 ? cine.zoom : 1;
+    if (zoom !== 1) g.setTransform(zoom, 0, 0, zoom, (1 - zoom) * VW / 2, (1 - zoom) * VH / 2);
     g.fillStyle = '#05060c'; g.fillRect(0, 0, VW, VH);
     // agua animada
     if (th.water) {
@@ -375,6 +391,7 @@
       }
     }
     g.drawImage(W.stat, -ox, -oy);
+    if (W.def.id === 'final') drawConsole(ox, oy);
     // puertas cerradas
     W.map.gates.forEach(gt => { if (!W.gatesOpen.has(gt.id)) gt.cells.forEach(([i, j]) => drawGate(i * TS - ox, j * TS - oy, W.gateWater.has(i + ',' + j) ? 'ghost' : th.gate, gt)); });
     // trenes
@@ -389,7 +406,8 @@
       g.fillStyle = p.c; const a = p.sparkle ? Math.sin(p.life * 10) : 1; g.globalAlpha = Math.max(0, Math.min(1, a * Math.min(1, p.life * 2))); g.fillRect(p.x - ox, p.y - oy, p.s, p.s); g.globalAlpha = 1;
     });
     drawLighting(ox, oy);
-    drawMarkers(ox, oy);
+    if (!cine) drawMarkers(ox, oy);
+    if (cine && window.MAU) { g.setTransform(1, 0, 0, 1, 0, 0); MAU.overlay(g, ox, oy, zoom); }
     if (flash > 0) { g.fillStyle = `rgba(220,230,255,${flash * 0.55})`; g.fillRect(0, 0, VW, VH); }
     if (fade > 0) { g.fillStyle = `rgba(0,0,0,${fade})`; g.fillRect(0, 0, VW, VH); }
   }
@@ -444,6 +462,7 @@
       case 'chela': drawCart(X, Y); break;
       case 'boss': {
         if (e.gone) break;
+        if (W.def.id === 'final') { drawMau(X, Y); break; }
         const spr = W.def.id === 'final' ? SPR.mauricio() : SPR.enemy(W.def.boss.sprite);
         const s = W.def.id === 'final' ? 2 : 3;
         g.fillStyle = 'rgba(0,0,0,0.4)'; g.beginPath(); g.ellipse(X, Y + 2, 8 * s / 2 + 4, 4, 0, 0, 7); g.fill();
@@ -487,6 +506,30 @@
   }
   function label(X, Y, t, c) { g.font = '8px "Pixelify Sans", monospace'; g.textAlign = 'center'; g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillText(t, X + 1, Y + 1); g.fillStyle = c; g.fillText(t, X, Y); }
 
+  // Mau: oculto hasta la revelación; durante las escenas puede verse como silueta
+  function drawMau(X, Y) {
+    const how = cine && cine.boss ? cine.boss : (S.mauSeen ? 'shown' : 'hidden');
+    if (how === 'hidden') return;
+    const s = 2, dx = (cine && cine.bossDX) || 0, dy = (cine && cine.bossDY) || 0;
+    const spr = how === 'silhouette' && window.MAU ? MAU.shadow() : SPR.mauricio();
+    g.fillStyle = 'rgba(0,0,0,0.4)'; g.beginPath(); g.ellipse(X + dx, Y + 2 + dy, 12, 4, 0, 0, 7); g.fill();
+    g.globalAlpha = cine && cine.bossAlpha != null ? cine.bossAlpha : 1;
+    g.drawImage(spr, X - 8 * s + dx, Y - 16 * s + dy, 16 * s, 16 * s);
+    g.globalAlpha = 1;
+    if (how === 'shown' && !cine) label(X, Y - 16 * s - 4, W.def.boss.name, '#ff8fa0');
+  }
+  // la consola del Servidor Central, en la pared norte del despacho de la Torre
+  function drawConsole(ox, oy) {
+    const X = 13 * TS + 8 - ox, Y = 2 * TS + 2 - oy;
+    const col = (cine && cine.console) || (S.done ? '#7ad7ff' : S.mauSeen ? '#ff4d6d' : '#5fe39a');
+    g.fillStyle = '#14121f'; g.fillRect(X - 24, Y - 4, 48, 22);
+    g.fillStyle = '#2c2748'; g.fillRect(X - 22, Y - 2, 44, 13);
+    const p = 0.55 + 0.45 * Math.sin(time * 3);
+    g.fillStyle = col; g.globalAlpha = 0.3 + 0.4 * p; g.fillRect(X - 20, Y, 40, 9); g.globalAlpha = 1;
+    g.fillStyle = '#0b0a14'; for (let i = 0; i < 3; i++) g.fillRect(X - 17, Y + 2 + i * 2.5, 12 + ((i * 7 + Math.floor(time * 4)) % 20), 1);
+    for (let i = 0; i < 5; i++) { g.fillStyle = (i + Math.floor(time * 5)) % 3 ? '#3a3550' : col; g.fillRect(X - 18 + i * 8, Y + 13, 4, 2); }
+    if (!cine) label(X, Y - 8, 'Servidor Central', '#9fe3ff');
+  }
   function drawPlayer(ox, oy) {
     const X = Math.round(P.x - ox), Y = Math.round(P.y - oy);
     g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(X, Y + 1, 5, 2, 0, 0, 7); g.fill();
@@ -792,9 +835,18 @@
   async function finalBoss() {
     const F = CONTENT.final.boss;
     const MP = SPR.mauPortrait();
-    if (S.finalAct === 0) await UI.dialog(['Buenas noches, Kai. Lo estuve siguiendo por la radio toda la noche.', 'Restauró los cinco núcleos. Ahora quiero ver si de verdad entendió... o si fue pura suerte.', 'Son tres actos. Si se equivoca, le explico y se lo vuelvo a preguntar más adelante. Así se estudia.'], { name: 'Profe Mauricio', portrait: MP });
+    const CINE = !!window.MAU && !AUTO; // en la prueba automática se juega igual que antes
+    const OPEN = ['Buenas noches, Kai. Lo estuve siguiendo por la radio toda la noche.', 'Restauró los cinco núcleos. Ahora quiero ver si de verdad entendió... o si fue pura suerte.', 'Son tres actos. Si se equivoca, le explico y se lo vuelvo a preguntar más adelante. Así se estudia.'];
+    if (CINE) { if (S.finalAct === 0) await MAU.reveal({ first: !S.mauSeen, lines: OPEN }); }
+    else if (S.finalAct === 0) await UI.dialog(OPEN, { name: 'Profe Mauricio', portrait: MP });
+    S.mauSeen = true; save();
     for (let a = S.finalAct; a < F.acts.length; a++) {
       const act = F.acts[a];
+      if (CINE) {
+        if (a > 0) await MAU.transition(a, { seen: !!S.mauActs[a] });
+        S.mauActs[a] = true; save();
+        await MAU.menu(a);
+      }
       await UI.dialog(act.intro, { name: 'Profe Mauricio · ' + act.title, portrait: MP });
       // cola de preguntas del acto
       let queue = [];
@@ -805,9 +857,10 @@
         ['p1', 'p2', 'p3', 'p4'].forEach(pid => queue.push(...LOGIC.pickQuestions(PH.find(p => p.id === pid).questions, S.stats, 1)));
       }
       const hp = queue.length;
-      AUDIO.music('boss');
+      AUDIO.music(CINE ? 'mau' + (a + 1) : 'boss');
       const p = UI.battle({
         name: 'Profe Mauricio', sprite: SPR.mauricio(), hp, state: S, boss: true, tag: 'EXAMEN FINAL · ' + act.title,
+        skin: CINE ? 'mau' : null, fx: CINE ? MAU.battleFx(a) : null,
         taunt: 'Con calma. Lea toda la pregunta antes de responder.',
         nextQuestion: () => { const q = queue.shift(); if (q) asked.add(q.id); return q; },
         lessonOf: q => lessonById[q.l],
@@ -831,8 +884,8 @@
       if (a < F.acts.length - 1) UI.toast(`${act.title} superado · +2 de energía`, 'gold');
     }
     S.done = true; save();
-    AUDIO.music('win');
-    await UI.dialog(F.lines.win, { name: 'Profe Mauricio', portrait: MP });
+    if (CINE) await MAU.epilogue({ win: F.lines.win });
+    else { AUDIO.music('win'); await UI.dialog(F.lines.win, { name: 'Profe Mauricio', portrait: MP }); }
     await ending();
   }
 
@@ -876,6 +929,7 @@
     await UI.card(`Fase ${d.num} completada`, `<p><b>${UI.esc(d.name)}</b></p><p>Precisión en esta fase: <b>${pct} %</b> (${r} correctas, ${w} por mejorar).</p>
       <p>Temas dominados:</p><ul>${d.lessons.map(l => `<li>${UI.esc(l.title)}</li>`).join('')}</ul>
       ${w ? '<p>Sus errores quedaron guardados: el Profe Mauricio y Erika se los volverán a preguntar.</p>' : '<p>¡Sin errores! Impresionante.</p>'}`, 'Siguiente', 'phase-card');
+    if (window.MAU && !AUTO && d.num && !S.mauRadio[d.id]) { S.mauRadio[d.id] = true; await MAU.radio(d.num); }
     S.checkpoint = null;
     const next = W.i + 1;
     if (next <= FINAL_IDX) { S.unlocked = Math.max(S.unlocked, next + 1); await enterPhase(next); }
@@ -889,6 +943,7 @@
     await UI.card('Amanece en Puerto Nyder', `<p>El Servidor Central está encendido. Los trenes van en orden, la bóveda tiene respaldos, el mercado usa índices y las islas están sincronizadas.</p>
       <p><b>Resultado global:</b> ${r} respuestas correctas y ${w} por repasar (${r + w ? Math.round(100 * r / (r + w)) : 0} %).</p><ul>${per}</ul>
       <p>Tiempo de juego: ${Math.round(S.playMs / 60000)} min.</p><p class="credits">Una aventura de <b>NYDER GAMES</b><br>Contenido: Guías #8 a #13 y Resumen de las investigaciones · IF0010 Bases de Datos II<br>Sonidos y logo: proyecto Five Doors at Freddy's (dreiklx)</p>
+      ${S.mauSeen ? '<p>El Profe Mauricio ya no controla la Torre: el Servidor Central responde otra vez a todo el puerto, y ningún usuario tiene todos los permisos.</p>' : ''}
       <p>¡Mucha suerte en el examen! Puede volver a cualquier fase desde el menú para repasar.</p>`, 'Volver al título', 'phase-card');
     if (!AUTO) await toTitle();
   }
@@ -961,6 +1016,8 @@
       { label: 'Material del curso' },
       { label: AUDIO.isMuted() ? 'Sonido: apagado' : 'Sonido: encendido' },
       { label: 'Copia de seguridad', sub: 'Exportar o importar su avance (.json)' }];
+    // al final, para no cambiar los números de las opciones de arriba
+    if (window.INSTALL && INSTALL.canOffer()) items.push({ label: 'Instalar aplicación', sub: 'Pantalla completa y sin internet' });
     const k = await UI.menu('Menú', items, { cls: 'title-menu', cancel: false });
     if (k === 0) {
       if (saved) { const c = await UI.menu('¿Empezar de cero?', [{ label: 'Sí, nueva partida', sub: 'Se borra el progreso guardado' }, { label: 'No, volver' }]); if (c !== 0) return toTitle(); }
@@ -977,6 +1034,7 @@
     if (k === 4) { await material(); return toTitle(); }
     if (k === 5) { AUDIO.toggleMute(); return toTitle(); }
     if (k === 6) { await backupMenu(); return toTitle(); }
+    if (k === 7 && window.INSTALL) { await INSTALL.welcome({ fromMenu: true }); return toTitle(); }
     return toTitle();
   }
   async function story() {
@@ -1080,6 +1138,13 @@
     if (AUTO) return autotest();
     const shot = params.get('shot');
     if (shot) return shotMode(shot);
+    // teléfono en el navegador: primero la bienvenida que ofrece instalar la app.
+    // Su botón "Continuar" ya es un toque, así que reemplaza la pantalla de "Toque la pantalla".
+    if (window.INSTALL && INSTALL.shouldWelcome()) {
+      await INSTALL.welcome(); AUDIO.init();
+      await splash();
+      return toTitle();
+    }
     const gate = document.getElementById('press');
     gate.hidden = false;
     await new Promise(res => { const go = () => { window.removeEventListener('keydown', go); gate.removeEventListener('click', go); res(); }; window.addEventListener('keydown', go); gate.addEventListener('click', go); });
@@ -1111,6 +1176,22 @@
     else if (ui === 'lessonflow') { S.talked[W.def.id] = true; interact(W.ents.find(e => e.type === 'lesson')); }
     else if (ui === 'splash') splash();
     else if (ui === 'hud') updateHud(true);
+    // v5: capturas del juego real (bienvenida móvil, evento en directo, jefes con su flujo completo)
+    else if (ui === 'install') { W = null; mode = 'title'; titleEl.hidden = false; INSTALL.welcome(); }
+    else if (ui === 'maumenu') { S.mauSeen = true; updateHud(true); MAU.menu(+(params.get('act') || 0)); }
+    else if (ui === 'mauepi') { S.mauSeen = true; S.done = true; MAU.epilogue({ win: CONTENT.final.boss.lines.win }); }
+    else if (ui === 'mauradio') { updateHud(true); MAU.radio(+(params.get('n') || 1)); }
+    else if (ui === 'live') { updateHud(true); if (window.LIVE) LIVE.trigger(); }
+    else if (ui === 'bossfight' || ui === 'final') {
+      const e = W.ents.find(x => x.type === 'boss');
+      if (params.get('hearts')) S.hearts = +params.get('hearts');
+      if (ui === 'final') S.finalAct = +(params.get('act') || 0);
+      if (params.get('seen')) { S.mauSeen = true; S.mauActs = { 1: true, 2: true }; }
+      if (e) { P.x = e.x * TS + 8; P.y = (e.y + 2) * TS + 12; snapCam(); }
+      updateHud(true);
+      // con &pause=1 se deja ver al jefe en el mapa y el encuentro empieza al llamar window.__startBoss()
+      if (e && params.get('pause')) window.__startBoss = () => interact(e); else if (e) interact(e);
+    }
   }
 
   /* ======================= Prueba automática ======================= */

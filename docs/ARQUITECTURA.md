@@ -21,7 +21,13 @@ El índice se generó con **Graphify** el 2026-11-19 a partir del código (AST):
 | Guardado | `js/save.js` | localStorage y exportar o importar una copia `.json` |
 | Táctil | `js/touch.js` | Joystick y botones que emiten los mismos eventos de teclado |
 | Motor | `js/game.js` | Bucle, cámara, render, objetivos con checklist, combates, rescate de Erika, jefe final en 3 actos, intro de NYDER, autotest y modo captura |
-| Sin conexión | `sw.js` y `manifest.webmanifest` | PWA instalable. `tools/build_sw.js` genera la lista de caché con un hash del contenido |
+| Sin conexión | `sw.js` y `manifest.webmanifest` | PWA instalable. `tools/build_sw.js` genera la lista de caché con un hash del contenido. Responde audio por partes (206) para Safari |
+| Instalación | `js/install.js` | Bienvenida en teléfonos: botón INSTALAR (Android), pasos de Compartir (iPhone), aviso en navegadores de otras apps; registra el service worker y avisa si hay versión nueva |
+| Evento | `js/live.js` | "Erika Ceviches en directo": evento simulado y poco frecuente durante el juego libre (`?live=1` lo fuerza) |
+| Estilos v5 | `css/v3.css` | Controles del reproductor, bienvenida móvil, aviso de girar, aviso de versión y el evento |
+| Jefe final (v6) | `js/mau.js` y `css/mau.css` | Revelación de Mau sobre el mapa real (cámara, zoom, oscuridad, silueta, interferencias), menú exclusivo por acto, apariencia del combate por acto, transiciones, epílogo con la recuperación del control y las pistas por radio. game.js expone `window.GAMECINE` (cámara, zoom y cómo se ve Mau) y ui.js acepta `cfg.skin`/`cfg.fx` solo para presentación |
+
+El reproductor (`js/video.js`) sigue siendo el mismo motor en Canvas por tramos. Encima tiene una línea de tiempo: suma la duración real de cada MP3 (o la estima) y, al buscar, reconstruye el dibujo hasta ese instante y arranca la narración en el mismo segundo.
 
 ## Flujo de una fase
 
@@ -41,5 +47,11 @@ En los combates, responder bien hace que Kai ataque. Si se falla, el enemigo ata
 | `run_autotest.js` | Juega todo el juego en Chrome sin ventana: `node tools/run_autotest.js http://localhost:8642/` |
 | `serve.js` | Servidor local para probar la PWA |
 | `shots.js` | Capturas de pantalla |
+| `capture.js` + `plans/*.json` | Capturas por guion con teclas, toques y arrastres reales (video, teléfono, evento) |
+| `boss_shots.js` | Juega cada combate de jefe y el de Mau completos y captura cada etapa en `screenshots/` |
+| `gallery.js` | Genera `screenshots/index.html` |
+| `test_v5.js` | Pruebas del reproductor, la instalación, el modo sin conexión y el evento |
+| `test_mau.js` | Juega la pelea contra Mau completa (también con `MOBILE=1`): escenas, menús, tres actos, epílogo, saltar escena, derrota de Kai, radio, audio sin pistas duplicadas; con una carpeta como argumento guarda las capturas |
+| `gen_splash.js` | Pantallas de arranque de iPhone (`assets/splash`) |
 | `voice_lines.js` → `synth_qwen.py` → `encode_voice.sh` | Narración con Qwen3-TTS desde el entorno de Story Lab y conversión a MP3 |
 | `exe/` | Lanzador portable para Windows: `node tools/exe/build_exe.js` |

@@ -22,7 +22,13 @@ async function run(mobile) {
   if (mobile) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
   await send('Page.navigate', { url: base }); await sleep(2500);
   const before = await ev('AUDIO.state()');
-  if (mobile) { await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: W / 2, y: H / 2 }] }); await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); }
+  if (mobile) {
+    // v5: en teléfono primero aparece la bienvenida (instalar app); su botón "Continuar en el navegador"
+    // es el toque que reemplaza a "Toque la pantalla". Se toca ese botón, igual que una persona.
+    const b = await ev(`(() => { const e = document.querySelector('#install .ins-skip'); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
+    const p = b || { x: W / 2, y: H / 2 };
+    await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [p] }); await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  }
   else { await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: W / 2, y: H / 2, button: 'left', clickCount: 1 }); await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: W / 2, y: H / 2, button: 'left', clickCount: 1 }); }
   await sleep(4500); // intro de NYDER + menú
   const after = await ev('AUDIO.state()');

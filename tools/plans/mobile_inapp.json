@@ -1,0 +1,8 @@
+{ "out": "screenshots",
+  "viewport": { "w": 390, "h": 844, "mobile": true, "dpr": 3 },
+  "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 350.0.0.0",
+  "platform": "iPhone",
+  "steps": [
+  {"nav":"","settle":2500},
+  {"shot":"mobile/14_dentro_de_otra_app"}
+]}

@@ -1,0 +1,19 @@
+{ "out": "screenshots",
+  "viewport": { "w": 1280, "h": 720 },
+  "steps": [
+  {"nav":"shot=p1&ui=hud&live=1","settle":1500},
+  {"until":"!!document.querySelector('.live-notif.in')","timeout":12000}, {"wait":1400},
+  {"shot":"live_erika/01_aviso_en_pleno_juego"},
+  {"click":".ln-go"}, {"wait":1500},
+  {"shot":"live_erika/02_directo_comienza"},
+  {"wait":8200},
+  {"shot":"live_erika/03_regalo_y_chat"},
+  {"wait":19800},
+  {"shot":"live_erika/04_fin_del_directo"},
+  {"nav":"shot=p1&ui=hud","settle":2200},
+  {"shot":"../assets/screens/wide-1.jpg"},
+  {"nav":"shot=p2&ui=boss","settle":2400},
+  {"shot":"../assets/screens/wide-2.jpg"},
+  {"nav":"shot=p1&ui=video:p1l1:1","settle":2800},
+  {"shot":"../assets/screens/wide-3.jpg"}
+]}

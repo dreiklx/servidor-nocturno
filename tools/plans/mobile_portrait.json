@@ -1,0 +1,10 @@
+{ "out": "screenshots",
+  "viewport": { "w": 412, "h": 915, "mobile": true, "dpr": 2 },
+  "ua": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36",
+  "steps": [
+  {"nav":"","settle":2500},
+  {"shot":"mobile/11_android_bienvenida_vertical"},
+  {"log":"['bienvenida', document.getElementById('install').dataset.kind, INSTALL.info]"},
+  {"tap":".ins-skip"}, {"wait":1500},
+  {"shot":"mobile/12_vertical_aviso_girar"}
+]}

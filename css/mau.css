@@ -1,0 +1,105 @@
+/* =====================================================================
+   Jefe final · Mau: escenas, menú exclusivo, panel del Servidor Central y combate
+   ===================================================================== */
+body.cine #hud, body.cine #touch, body.cine .live-notif { display: none !important; }
+
+/* capa de la escena: deja ver el mapa (la escena dibuja en el lienzo del juego) */
+.modal.cine-ui { inset: 0; background: transparent; cursor: pointer; z-index: 30; }
+.cine-sub { position: absolute; left: 7%; right: 7%; bottom: calc(11.8% + .6em); display: flex; gap: .7em; align-items: flex-end; background: linear-gradient(180deg, #07060ddd, #07060df5); border: 1px solid #ffffff22; border-left: 3px solid var(--gold); border-radius: 10px; padding: .55em .8em; animation: pop .25s ease both; }
+.cine-sub.voice { border-left-color: #ff4d6d; background: #000000e6; }
+.cine-sub.voice .cs-who { color: #ff8fa0; letter-spacing: .12em; }
+.cine-sub.kai { border-left-color: var(--blue); }
+.cs-por { flex: none; width: 3.4em; height: 3.4em; border-radius: 8px; overflow: hidden; background: #1b1530; border: 1px solid #ffffff22; }
+.cs-por canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+.cs-body { flex: 1; min-width: 0; }
+.cs-who { display: block; font-family: var(--pix); font-size: .78em; color: var(--gold); }
+.cs-text { margin: .1em 0 0; font-size: .98em; line-height: 1.38; color: #f4f0ff; min-height: 2.7em; }
+.cs-more { font-style: normal; color: var(--gold); font-size: .7em; animation: livePulse 1s infinite; }
+.cine-skip { position: absolute; right: 2.5%; top: calc(11.8% + .6em); background: #07060dcc; color: #e9e4ff; border: 1px solid #ffffff44; border-radius: 99px; padding: .3em .9em; font-family: var(--pix); font-size: .8em; min-height: 2.2em; }
+.cine-skip:hover { border-color: var(--gold); color: var(--gold); }
+
+/* título de jefe y de acto */
+.mau-title { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .1em; pointer-events: none; text-align: center; font-family: var(--pix); }
+.mau-title small { font-size: .9em; letter-spacing: .5em; color: #ff8fa0; opacity: 0; }
+.mau-title b { position: relative; font-size: 4.6em; line-height: 1; color: #fff; letter-spacing: .06em; text-shadow: 0 0 24px #ff4d6d99, 0 4px 0 #000; opacity: 0; }
+.mau-title b::before, .mau-title b::after { content: attr(data-t); position: absolute; inset: 0; opacity: .7; }
+.mau-title b::before { color: #7ad7ff; transform: translate(-3px, 0); clip-path: inset(10% 0 55% 0); }
+.mau-title b::after { color: #ff4d6d; transform: translate(3px, 0); clip-path: inset(55% 0 8% 0); }
+.mau-title span { font-size: 1em; color: #e9e4ff; letter-spacing: .2em; text-transform: uppercase; opacity: 0; }
+.mau-title.go small { animation: mtIn .5s .1s ease both; }
+.mau-title.go b { animation: mtSlam .55s .25s cubic-bezier(.2, 1.4, .4, 1) both, mtGlitch 2.4s .9s steps(1) infinite; }
+.mau-title.go span { animation: mtIn .6s .7s ease both; }
+.mau-title.out { animation: mtOut .38s ease both; }
+@keyframes mtIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes mtSlam { from { opacity: 0; transform: scale(1.8); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes mtGlitch { 0%, 88%, 100% { transform: none; } 90% { transform: translate(4px, -1px) skewX(8deg); } 93% { transform: translate(-3px, 1px); } }
+@keyframes mtOut { to { opacity: 0; transform: scale(.96); } }
+
+/* menú exclusivo del jefe final */
+.modal.mau-menu { inset: 0; background: #030308; overflow: hidden; z-index: 32; }
+.mau-menu canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+.mm-ui { position: absolute; left: 5%; top: 7%; bottom: 7%; width: 52%; display: flex; flex-direction: column; gap: .45em; font-family: var(--pix); }
+.mm-top { display: flex; align-items: center; gap: .7em; flex-wrap: wrap; }
+.mm-tag { background: #ff4d6d; color: #1a0208; padding: .1em .55em; border-radius: 5px; font-size: .78em; letter-spacing: .15em; }
+.mm-place { color: #a9aed6; font-size: .72em; letter-spacing: .08em; }
+.mm-name { position: relative; margin: .1em 0 0; font-size: 5.4em; line-height: .9; font-weight: 700; color: #fff; letter-spacing: .04em; text-shadow: 0 0 30px #ff4d6d66; animation: mtSlam .6s .1s cubic-bezier(.2, 1.4, .4, 1) both; }
+.mm-name::before, .mm-name::after { content: attr(data-t); position: absolute; inset: 0; opacity: .6; animation: mtGlitch 3s 1s steps(1) infinite; }
+.mm-name::before { color: #7ad7ff; transform: translateX(-3px); clip-path: inset(15% 0 55% 0); }
+.mm-name::after { color: #ff4d6d; transform: translateX(3px); clip-path: inset(60% 0 5% 0); }
+.mm-sub { color: var(--gold); letter-spacing: .3em; text-transform: uppercase; font-size: .95em; animation: mtIn .6s .5s both; }
+.mm-acts { list-style: none; margin: .5em 0 0; padding: 0; display: flex; gap: .4em; }
+.mm-acts li { flex: 1; min-width: 0; border: 1px solid #ffffff22; border-radius: 8px; padding: .3em .45em; background: #ffffff08; color: #6f6a90; font-size: .72em; display: flex; flex-direction: column; }
+.mm-acts li b { font-size: 1.3em; }
+.mm-acts li span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mm-acts li.done { color: #a9aed6; text-decoration: line-through; text-decoration-color: #ffffff44; }
+.mm-acts li.now { color: #fff; border-color: var(--gold); background: #ffd34d1c; box-shadow: 0 0 18px #ffd34d33; }
+.act-2 .mm-acts li.now { border-color: #ff4d6d; background: #ff4d6d1c; box-shadow: 0 0 18px #ff4d6d44; }
+.act-3 .mm-acts li.now { border-color: #7ad7ff; background: #7ad7ff1a; box-shadow: 0 0 18px #7ad7ff44; }
+.mm-info { margin-top: auto; display: flex; flex-direction: column; gap: .2em; }
+.mm-act { font-size: 1.05em; color: #fff; }
+.mm-topic { font-family: var(--body); font-size: .82em; color: #c9c4e8; }
+.mm-hp { font-size: .72em; color: #a9aed6; display: flex; align-items: center; gap: .5em; }
+.mm-hp i { display: inline-block; width: .8em; height: .72em; margin-right: .15em; background: #ff4d6d; clip-path: polygon(50% 100%, 0 40%, 0 15%, 15% 0, 35% 0, 50% 15%, 65% 0, 85% 0, 100% 15%, 100% 40%); }
+.mm-hp i.e { background: #3a2a3a; }
+.mm-go { align-self: flex-start; margin-top: .5em; font-family: var(--pix); font-size: 1.05em; letter-spacing: .06em; color: #1a0208; background: linear-gradient(180deg, #ff7a90, #ff4d6d); border: 0; border-radius: 10px; padding: .55em 1.2em; min-height: 2.6em; box-shadow: 0 4px 0 #8a1830, 0 0 26px #ff4d6d66; animation: mmPulse 1.8s ease-in-out infinite; }
+.act-3 .mm-go { color: #021220; background: linear-gradient(180deg, #a9e8ff, #7ad7ff); box-shadow: 0 4px 0 #2b6f8f, 0 0 26px #7ad7ff66; }
+.mm-go:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.mm-go kbd { color: inherit; border-color: #0004; background: #0002; }
+@keyframes mmPulse { 50% { transform: translateY(-1px); filter: brightness(1.12); } }
+.modal.mau-menu.leaving { animation: mmLeave .42s ease both; }
+@keyframes mmLeave { 40% { filter: brightness(2.4); } to { opacity: 0; transform: scale(1.04); } }
+
+/* panel del Servidor Central (epílogo) */
+.modal.mau-control { inset: 6% 8%; background: radial-gradient(circle at 50% 50%, #0a1a2ef2, #05040cf8); border: 2px solid #7ad7ff66; border-radius: 14px; box-shadow: 0 0 40px #7ad7ff33; display: flex; flex-direction: column; align-items: center; padding: .6em .8em; gap: .3em; z-index: 34; }
+.mc-head { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: .6em; flex-wrap: wrap; font-family: var(--pix); font-size: .8em; color: #9fe3ff; letter-spacing: .1em; }
+.mc-owner { font-weight: 400; color: #c9c4e8; letter-spacing: 0; }
+.mc-owner em { font-style: normal; color: #ff8fa0; }
+.mc-owner em.ok { color: #7ad7ff; }
+.mau-control svg { flex: 1; min-height: 0; width: 100%; }
+.mc-link { stroke: #ff4d6d; stroke-width: 3; stroke-dasharray: 6 6; animation: mcFlow 1s linear infinite; transition: stroke .5s; }
+.mc-link.free { stroke: #7ad7ff; stroke-dasharray: none; filter: drop-shadow(0 0 6px #7ad7ff); }
+@keyframes mcFlow { to { stroke-dashoffset: -12; } }
+.mc-tower circle { fill: #1a0a14; stroke: #ff4d6d; stroke-width: 3; transition: fill .6s, stroke .6s; }
+.mc-tower.free circle { fill: #0b2236; stroke: #ffd34d; filter: drop-shadow(0 0 10px #ffd34d); }
+.mau-control text { fill: #f4f0ff; font: 13px "Pixelify Sans", monospace; text-anchor: middle; }
+.mc-core circle { fill: #12101e; stroke: #ff4d6d; stroke-width: 2.5; transition: stroke .4s, fill .4s; }
+.mc-core .who { fill: #ff8fa0; font-size: 10px; }
+.mc-core.free circle { stroke: #7ad7ff; fill: #0b1d2e; }
+.mc-core.free .who { fill: #7ad7ff; }
+.mc-core .lock rect { fill: #ff4d6d; } .mc-core .lock path { fill: none; stroke: #ff4d6d; stroke-width: 2.5; }
+.mc-core.free .lock { opacity: 0; transition: opacity .3s; }
+.mc-cmd { font-family: Consolas, 'Courier New', monospace; font-size: .8em; color: #ffd34d; min-height: 1.4em; text-align: center; }
+.mc-go { font-family: var(--pix); font-size: 1em; color: #021220; background: linear-gradient(180deg, #a9e8ff, #7ad7ff); border: 0; border-radius: 10px; padding: .45em 1.1em; min-height: 2.5em; box-shadow: 0 4px 0 #2b6f8f, 0 0 22px #7ad7ff55; }
+.mc-go:disabled { opacity: .75; }
+
+/* combate contra Mau: marco propio */
+.modal.battle2.skin-mau { border-color: #ff4d6d; box-shadow: 0 0 0 2px #00000088, 0 0 40px #ff4d6d44; background: #07050ff4; }
+
+@media (max-height: 520px), (max-width: 900px) {
+  .mm-ui { width: 60%; top: 5%; bottom: 5%; }
+  .mm-name { font-size: 4.2em; }
+  .mau-title b { font-size: 3.6em; }
+  .modal.mau-control { inset: 3% 4%; }
+  .cine-sub { left: 3%; right: 3%; }
+}
+@media (prefers-reduced-motion: reduce) { .mau-title b, .mm-name, .mm-name::before, .mm-name::after, .mm-go, .mc-link { animation: none !important; } }

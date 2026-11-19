@@ -156,7 +156,8 @@ window.UI = (function () {
   function battle(cfg) {
     return new Promise(resolve => {
       const S = cfg.state, th = MOVES[cfg.theme || UI.theme] || MOVES.final;
-      const m = h('div', 'modal battle2' + (cfg.boss ? ' boss' : ''));
+      const m = h('div', 'modal battle2' + (cfg.boss ? ' boss' : '') + (cfg.skin ? ' skin-' + cfg.skin : ''));
+      const FX = cfg.fx || null; // presentación opcional (jefe final): no cambia la lógica del combate
       m.innerHTML = `
         <div class="bt-arena"><canvas width="960" height="680"></canvas></div>
         <div class="bt-msg"><span></span><i class="bt-more">▼</i></div>
@@ -204,6 +205,7 @@ window.UI = (function () {
         x.fillStyle = 'rgba(0,0,0,0.35)'; x.beginPath(); x.ellipse(340, 182, 100, 20, 0, 0, 7); x.fill();
         x.fillStyle = th.c; x.globalAlpha = 0.25; x.beginPath(); x.ellipse(340, 180, 96, 18, 0, 0, 7); x.fill();
         x.globalAlpha = 0.35; x.beginPath(); x.ellipse(130, 318, 120, 22, 0, 0, 7); x.fill(); x.globalAlpha = 1;
+        if (FX && FX.back) FX.back(x, t, A, now);
         // enemigo
         const fs = cfg.boss ? 8 : 7, fw = foeCv.width * fs, fh = foeCv.height * fs;
         if (A.foeAlpha > 0) {
@@ -229,9 +231,10 @@ window.UI = (function () {
         A.sparks = A.sparks.filter(p => (p.life -= 0.016) > 0);
         A.sparks.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.15; x.fillStyle = p.c; x.globalAlpha = Math.min(1, p.life * 2); x.fillRect(p.x, p.y, 3, 3); });
         x.globalAlpha = 1;
+        if (FX && FX.front) FX.front(x, t, A, now);
         // cajas de info
         shownHp += (hp - shownHp) * 0.08; shownHearts += (S.hearts - shownHearts) * 0.08;
-        infoBox(14, 16, cfg.name, Math.max(0, shownHp) / cfg.hp, cfg.tag || (cfg.boss ? 'JEFE' : ''));
+        if (FX && FX.foeBar) FX.foeBar(x, Math.max(0, shownHp) / cfg.hp, hp, cfg.hp, t); else infoBox(14, 16, cfg.name, Math.max(0, shownHp) / cfg.hp, cfg.tag || (cfg.boss ? 'JEFE' : ''));
         infoBox(266, 262, 'Kai', Math.max(0, shownHearts) / S.maxHearts, `${S.hearts}/${S.maxHearts} · limoncitos ${S.lemons}`);
         x.restore();
         if (A.flash > 0) { x.fillStyle = A.flashC; x.globalAlpha = A.flash; x.fillRect(0, 0, 480, 340); x.globalAlpha = 1; A.flash = Math.max(0, A.flash - 0.06); }
@@ -252,14 +255,14 @@ window.UI = (function () {
         await tween(A, 'meY', -10, 120); await tween(A, 'meY', 0, 120);
         A.shot = { x1: 165, y1: 250, x2: 340, y2: 140, c: th.c, t: performance.now(), d: 420 };
         await sleep(420); A.shot = null;
-        AUDIO.fx.hit(); A.flash = 0.7; A.flashC = '#ffffff'; A.shake = 8; A.foeFlash = 600; burstAt(340, 140, th.c, 26);
+        AUDIO.fx.hit(); A.flash = 0.7; A.flashC = '#ffffff'; A.shake = 8; A.foeFlash = 600; burstAt(340, 140, th.c, 26); if (FX && FX.hit) FX.hit('foe', A);
         hp--; await tween(A, 'foeX', 10, 60); await tween(A, 'foeX', -8, 60); await tween(A, 'foeX', 0, 60);
         await msg(isRetry ? '¡Segunda oportunidad aprovechada!' : pick(['¡Es muy efectivo!', '¡Golpe crítico de conocimiento!', '¡Le dio de lleno!']), 600);
         say(cfg.lines && cfg.lines.right ? pick(cfg.lines.right) : '');
       }
       async function attackMe(move) {
         await msg(`¡${cfg.name} usó ${move}!`, 250);
-        await tween(A, 'foeX', -40, 160); AUDIO.fx.bad(); A.flash = 0.6; A.flashC = '#ff3040'; A.shake = 12; A.meFlash = 600; burstAt(130, 270, '#ff5d6c', 22);
+        await tween(A, 'foeX', -40, 160); AUDIO.fx.bad(); A.flash = 0.6; A.flashC = '#ff3040'; A.shake = 12; A.meFlash = 600; burstAt(130, 270, '#ff5d6c', 22); if (FX && FX.hit) FX.hit('me', A);
         await tween(A, 'foeX', 0, 200);
         if (!cfg.safe) S.hearts = Math.max(0, S.hearts - 1);
         await msg(cfg.safe ? 'Repaso sin castigo: no pierde energía.' : 'Kai perdió 1 de energía.', 500);
